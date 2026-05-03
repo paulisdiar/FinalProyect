@@ -8,7 +8,7 @@ import tile.TileManager;
 
 public class Enemy extends GameObject {
 
-	private static final int SPEED = 4;
+	private static final int SPEED = 6;
 	private int dx;
 	private TileManager tileManager;
 
