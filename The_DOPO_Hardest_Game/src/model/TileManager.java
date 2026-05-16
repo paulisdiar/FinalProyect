@@ -1,4 +1,4 @@
-package tile;
+package model;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import math.Vector2D;
-
-import controlador.Window;
-import graphics.Assets;
-import states.GameState;
+import Controller.Window;
+import View.Assets;
+import View.Vector2D;
 
 public class TileManager {
 
@@ -54,7 +52,7 @@ public class TileManager {
 				if (type == 0) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
 				if (type == 1) g.drawImage(Assets.tilePath2, x, y, tileW, tileH, null);
 				if (type == 2) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
-				if (type == 4) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
+				if (type == 4 || type == 6 || type == 7) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 5) g.drawImage((row + col) % 2 == 0 ? Assets.tilePath1 : Assets.tilePath2, x, y, tileW, tileH, null);
 			}
 		}
@@ -69,6 +67,35 @@ public class TileManager {
 				if (mapData[row][col] == 5)
 					positions.add(new Vector2D(col * tileW, row * tileH));
 		return positions;
+	}
+
+	public Vector2D getSpawnPlayer1() {
+		return getSpawnPosition(6);
+	}
+
+	public Vector2D getSpawnPlayer2() {
+		return getSpawnPosition(7);
+	}
+
+	private Vector2D getSpawnPosition(int tileType) {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		for (int row = 0; row < mapData.length; row++)
+			for (int col = 0; col < mapData[0].length; col++)
+				if (mapData[row][col] == tileType)
+					return new Vector2D(col * tileW, row * tileH);
+		return new Vector2D(0, 0);
+	}
+
+	public boolean isCheckpoint(int x, int y) {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		int col = x / tileW;
+		int row = y / tileH;
+		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length)
+			return false;
+		int type = mapData[row][col];
+		return type == 4 || type == 6;
 	}
 
 	public boolean isGoal(int x, int y) {

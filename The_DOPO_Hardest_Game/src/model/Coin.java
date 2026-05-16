@@ -1,9 +1,9 @@
-package gameObjects;
+package model;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import math.Vector2D;
+import View.Vector2D;
 
 public class Coin extends GameObject {
 
@@ -13,8 +13,13 @@ public class Coin extends GameObject {
 		super(position, texture);
 	}
 
-	public boolean isCollected() { return collected; }
-	public void collect()        { collected = true; }
+	public boolean isCollected(){ 
+		return collected; 
+	}
+	
+	public void collect(){ 
+		collected = true; 
+	}
 
 	@Override public void update() {}
 

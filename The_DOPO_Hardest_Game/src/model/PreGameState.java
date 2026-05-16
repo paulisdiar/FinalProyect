@@ -1,4 +1,4 @@
-package states;
+package model;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,7 +16,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import controlador.Window;
+import Controller.Window;
 
 public class PreGameState {
 
@@ -87,20 +87,24 @@ public class PreGameState {
 
 		window.add(texto, BorderLayout.CENTER);
 
-		JPanel panelBotones = new JPanel(new GridLayout(1, 2, 10, 10));
-		panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 200, 20, 200));
+		JPanel panelBotones = new JPanel(new GridLayout(1, 3, 10, 10));
+		panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 100, 20, 100));
 
-		JButton bJugar = new JButton("¡Jugar!");
-		JButton bVolver = new JButton("Volver");
+		JButton bVolver  = new JButton("Volver");
+		JButton bJugar   = new JButton("¡Jugar!");
+		JButton bJugar2p = new JButton("Jugar 2 Jugadores");
 
-		bJugar.setFont(new Font("Arial", Font.BOLD, 16));
 		bVolver.setFont(new Font("Arial", Font.PLAIN, 16));
+		bJugar.setFont(new Font("Arial", Font.BOLD, 16));
+		bJugar2p.setFont(new Font("Arial", Font.BOLD, 16));
 
-		bJugar.addActionListener(e -> window.startGame());
 		bVolver.addActionListener(e -> window.goToMenu());
+		bJugar.addActionListener(e -> window.startGame(false));
+		bJugar2p.addActionListener(e -> window.startGame(true));
 
 		panelBotones.add(bVolver);
 		panelBotones.add(bJugar);
+		panelBotones.add(bJugar2p);
 		window.add(panelBotones, BorderLayout.SOUTH);
 
 		window.revalidate();
