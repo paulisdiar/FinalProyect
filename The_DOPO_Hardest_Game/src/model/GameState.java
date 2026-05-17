@@ -6,6 +6,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import java.awt.image.BufferedImage;
+
 import Controller.Window;
 import View.GameMenuInput;
 
@@ -17,11 +19,15 @@ public class GameState {
 	final int originalTileSize = 18;
 	public final int tileSize = originalTileSize * 3;
 
-	private boolean twoPlayer;
+	private GameMode mode;
+	private BufferedImage texture1;
+	private BufferedImage texture2;
 
-	public GameState(Window window, boolean twoPlayer) {
+	public GameState(Window window, GameMode mode, BufferedImage texture1, BufferedImage texture2) {
 		this.window = window;
-		this.twoPlayer = twoPlayer;
+		this.mode = mode;
+		this.texture1 = texture1;
+		this.texture2 = texture2;
 		gameMenuInput = new GameMenuInput();
 		initMenu();
 		loadLevel(1);
@@ -29,8 +35,8 @@ public class GameState {
 
 	private void loadLevel(int index) {
 		if(index == 1) {
-			String map = twoPlayer ? "res/maps/level1_2p.txt" : "res/maps/level1.txt";
-			currentLevel = new Level(this, map, twoPlayer);
+			String map = (mode == GameMode.SOLO) ? "res/maps/level1.txt" : "res/maps/level1_2p.txt";
+			currentLevel = new Level(this, map, mode, texture1, texture2);
 		}
 	}
 

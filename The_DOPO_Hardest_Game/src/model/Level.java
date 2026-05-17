@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import java.awt.image.BufferedImage;
+
 import Controller.Window;
 import View.Assets;
 import View.Vector2D;
@@ -20,7 +22,7 @@ public class Level {
 	private GameState gp;
 	private Player player1;
 	private Player player2;
-	private boolean twoPlayer;
+	private GameMode mode;
 	private TileManager tileManager;
 	private List<Enemy> enemies;
 	private List<Coin> coins;
@@ -37,28 +39,41 @@ public class Level {
 
 	private static final int COIN_VALUE = 10;
 
-	public Level(GameState gp, String mapPath, boolean twoPlayer) {
+	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2) {
 		this.gp = gp;
-		this.twoPlayer = twoPlayer;
+		this.mode = mode;
 		tileManager = new TileManager(gp, mapPath);
 		startP1 = tileManager.getSpawnPlayer1();
-		player1  = new Player1(new Vector2D(startP1.getX(), startP1.getY()), Assets.player, tileManager);
-		if (twoPlayer) {
+		player1  = new Player1(new Vector2D(startP1.getX(), startP1.getY()), texture1, tileManager);
+		if (mode == GameMode.PVP || mode == GameMode.PVM) {
 			startP2 = tileManager.getSpawnPlayer2();
-			player2 = new Player2(new Vector2D(startP2.getX(), startP2.getY()), Assets.player, tileManager);
+			if (mode == GameMode.PVP)
+				player2 = new Player2(new Vector2D(startP2.getX(), startP2.getY()), texture2, tileManager);
+			else
+				player2 = new MachinePlayer(new Vector2D(startP2.getX(), startP2.getY()), texture2, tileManager, new RandomMovement());
 		}
 		initEnemies();
 		initCoins();
 		totalCoins = coins.size();
 	}
 
+	private boolean hasSecondPlayer() {
+		return mode == GameMode.PVP || mode == GameMode.PVM;
+	}
+
 	private void initEnemies() {
 		enemies = new ArrayList<>();
-		enemies.add(new BasicEnemy(new Vector2D(240, 240), Assets.enemy, tileManager,  1));
-		enemies.add(new BasicEnemy(new Vector2D(552, 264), Assets.enemy, tileManager, -1));
-		enemies.add(new BasicEnemy(new Vector2D(240, 288), Assets.enemy, tileManager,  1));
-		enemies.add(new BasicEnemy(new Vector2D(552, 312), Assets.enemy, tileManager, -1));
-		enemies.add(new BasicEnemy(new Vector2D(240, 336), Assets.enemy, tileManager,  1));
+		for (int[] s : tileManager.getEnemySpawns()) {
+			Vector2D pos = new Vector2D(s[0], s[1]);
+			MovementLogic ml = switch (s[2]) {
+				case 8  -> new HorizontalMovement( 1);
+				case 9  -> new HorizontalMovement(-1);
+				case 10 -> new VerticalMovement( 1);
+				case 11 -> new VerticalMovement(-1);
+				default -> new HorizontalMovement( 1);
+			};
+			enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, ml));
+		}
 	}
 
 	private void initCoins() {
@@ -86,7 +101,7 @@ public class Level {
 			if (getRect(player1).intersects(coinRect)) {
 				c.collect();
 				score1 += COIN_VALUE;
-			} else if (twoPlayer && getRect(player2).intersects(coinRect)) {
+			} else if (hasSecondPlayer() && getRect(player2).intersects(coinRect)) {
 				c.collect();
 				score2 += COIN_VALUE;
 			}
@@ -105,6 +120,18 @@ public class Level {
 		return count;
 	}
 
+	private void checkPlayerCollision() {
+		if (!hasSecondPlayer()) return;
+		if (getRect(player1).intersects(getRect(player2))) {
+			deaths1++;
+			deaths2++;
+			player1.getPosition().setX(startP1.getX());
+			player1.getPosition().setY(startP1.getY());
+			player2.getPosition().setX(startP2.getX());
+			player2.getPosition().setY(startP2.getY());
+		}
+	}
+
 	private void checkEnemyCollisions() {
 		for (Enemy e : enemies) {
 			Rectangle enemyRect = new Rectangle(
@@ -117,7 +144,7 @@ public class Level {
 				player1.getPosition().setX(startP1.getX());
 				player1.getPosition().setY(startP1.getY());
 			}
-			if (twoPlayer && getRect(player2).intersects(enemyRect)) {
+			if (hasSecondPlayer() && getRect(player2).intersects(enemyRect)) {
 				deaths2++;
 				player2.getPosition().setX(startP2.getX());
 				player2.getPosition().setY(startP2.getY());
@@ -133,7 +160,7 @@ public class Level {
 		boolean p1Goal = tileManager.isGoal(p1cx, p1cy);
 
 		boolean p2Goal = false;
-		if (twoPlayer) {
+		if (hasSecondPlayer()) {
 			int p2cx = (int) player2.getPosition().getX() + Assets.player.getWidth()  / 2;
 			int p2cy = (int) player2.getPosition().getY() + Assets.player.getHeight() / 2;
 			p2Goal = tileManager.isCheckpoint(p2cx, p2cy);
@@ -142,17 +169,29 @@ public class Level {
 		if (!p1Goal && !p2Goal) return;
 
 		levelComplete = true;
-		int fs1 = score1, fs2 = score2, d1 = deaths1, d2 = deaths2;
+		int timeBonus = timerTicks / 60;
+		int total1 = Math.max(0, score1 + timeBonus - deaths1 * 5);
+		int total2 = Math.max(0, score2 + timeBonus - deaths2 * 5);
+		int coins1 = score1, coins2 = score2, d1 = deaths1, d2 = deaths2;
 		boolean winner1 = p1Goal;
 
 		SwingUtilities.invokeLater(() -> {
+			String scoreBreakdown1 = "  Monedas: +" + coins1 + "  Tiempo: +" + timeBonus
+				+ "  Muertes: -" + (d1 * 5) + "  =  " + total1;
+			String scoreBreakdown2 = "  Monedas: +" + coins2 + "  Tiempo: +" + timeBonus
+				+ "  Muertes: -" + (d2 * 5) + "  =  " + total2;
+
 			String msg;
-			if (twoPlayer) {
+			if (mode == GameMode.PVP) {
 				String ganador = winner1 ? "¡Jugador 1 ganó!" : "¡Jugador 2 ganó!";
-				msg = ganador + "\n\nJugador 1 — Puntaje: " + fs1 + "  Muertes: " + d1
-					+ "\nJugador 2 — Puntaje: " + fs2 + "  Muertes: " + d2;
+				msg = ganador
+					+ "\n\nJugador 1:" + scoreBreakdown1
+					+ "\nJugador 2:" + scoreBreakdown2;
+			} else if (mode == GameMode.PVM) {
+				String ganador = winner1 ? "¡Jugador ganó!" : "¡La Máquina ganó!";
+				msg = ganador + "\n\nJugador:" + scoreBreakdown1;
 			} else {
-				msg = "¡Nivel completado!\nPuntaje: " + fs1 + "\nMuertes: " + d1;
+				msg = "¡Nivel completado!\n\nPuntaje:" + scoreBreakdown1;
 			}
 			JOptionPane.showMessageDialog(null, msg, "Fin del nivel", JOptionPane.INFORMATION_MESSAGE);
 			gp.getWindow().goToMenu();
@@ -162,8 +201,9 @@ public class Level {
 	public void update() {
 		if (levelComplete) return;
 		player1.update();
-		if (twoPlayer) player2.update();
+		if (hasSecondPlayer()) player2.update();
 		for (Enemy e : enemies) e.update();
+		checkPlayerCollision();
 		checkEnemyCollisions();
 		checkCoinCollisions();
 		checkGoal();
@@ -176,7 +216,7 @@ public class Level {
 			deaths1++;
 			player1.getPosition().setX(startP1.getX());
 			player1.getPosition().setY(startP1.getY());
-			if (twoPlayer) {
+			if (hasSecondPlayer()) {
 				deaths2++;
 				player2.getPosition().setX(startP2.getX());
 				player2.getPosition().setY(startP2.getY());
@@ -190,22 +230,25 @@ public class Level {
 		for (Enemy e : enemies) e.draw(g);
 		for (Coin c : coins)   c.draw(g);
 		player1.draw(g);
-		if (twoPlayer) player2.draw(g);
+		if (hasSecondPlayer()) player2.draw(g);
 
 		g.setFont(new Font("Arial", Font.BOLD, 16));
 		g.setColor(Color.BLACK);
 
 		int seconds = timerTicks / 60;
-		String timeText   = String.format("Tiempo: %02d:%02d", seconds / 60, seconds % 60);
-		String coinsText  = "Monedas: " + collectedCoins() + "/" + totalCoins;
+		String timeText  = String.format("Tiempo: %02d:%02d", seconds / 60, seconds % 60);
+		String coinsText = "Monedas: " + collectedCoins() + "/" + totalCoins;
 
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(timeText, 10, 20);
 		g.drawString(coinsText, Window.WIDTH - fm.stringWidth(coinsText) - 10, 20);
 
-		if (twoPlayer) {
+		if (mode == GameMode.PVP) {
 			g.drawString("J1 — Muertes: " + deaths1, 10, 40);
 			g.drawString("J2 — Muertes: " + deaths2, Window.WIDTH - fm.stringWidth("J2 — Muertes: " + deaths2) - 10, 40);
+		} else if (mode == GameMode.PVM) {
+			g.drawString("J — Muertes: " + deaths1, 10, 40);
+			g.drawString("MÁQ — Muertes: " + deaths2, Window.WIDTH - fm.stringWidth("MÁQ — Muertes: " + deaths2) - 10, 40);
 		} else {
 			String deathsText = "Muertes: " + deaths1;
 			g.drawString(deathsText, (Window.WIDTH - fm.stringWidth(deathsText)) / 2, 20);

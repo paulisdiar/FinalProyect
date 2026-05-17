@@ -54,6 +54,7 @@ public class TileManager {
 				if (type == 2) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 4 || type == 6 || type == 7) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 5) g.drawImage((row + col) % 2 == 0 ? Assets.tilePath1 : Assets.tilePath2, x, y, tileW, tileH, null);
+				if (type >= 8 && type <= 11) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
 			}
 		}
 	}
@@ -85,6 +86,19 @@ public class TileManager {
 				if (mapData[row][col] == tileType)
 					return new Vector2D(col * tileW, row * tileH);
 		return new Vector2D(0, 0);
+	}
+
+	public List<int[]> getEnemySpawns() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		List<int[]> spawns = new ArrayList<>();
+		for (int row = 0; row < mapData.length; row++)
+			for (int col = 0; col < mapData[0].length; col++) {
+				int t = mapData[row][col];
+				if (t >= 8 && t <= 11)
+					spawns.add(new int[]{ col * tileW, row * tileH, t });
+			}
+		return spawns;
 	}
 
 	public boolean isCheckpoint(int x, int y) {

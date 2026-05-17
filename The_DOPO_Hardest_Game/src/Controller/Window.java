@@ -8,8 +8,12 @@ import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
+import java.awt.image.BufferedImage;
+
 import View.Assets;
 import View.KeyBoard;
+import model.ColorConfigState;
+import model.GameMode;
 import model.GameState;
 import model.MenuState;
 import model.PreGameState;
@@ -52,7 +56,11 @@ public class Window extends JFrame implements Runnable{
 
 	}
 
-	public void startGame(boolean twoPlayer) {
+	public void showColorConfig(GameMode mode) {
+		new ColorConfigState(this, mode);
+	}
+
+	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2) {
 		keyBoard = new KeyBoard();
 
 		canvas = new Canvas();
@@ -72,7 +80,7 @@ public class Window extends JFrame implements Runnable{
 		setLocationRelativeTo(null);
 		repaint();
 
-		gameState = new GameState(this, twoPlayer);
+		gameState = new GameState(this, mode, texture1, texture2);
 		inMenu = false;
 	}
 

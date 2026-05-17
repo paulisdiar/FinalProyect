@@ -87,24 +87,28 @@ public class PreGameState {
 
 		window.add(texto, BorderLayout.CENTER);
 
-		JPanel panelBotones = new JPanel(new GridLayout(1, 3, 10, 10));
-		panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 100, 20, 100));
+		JPanel panelBotones = new JPanel(new GridLayout(1, 4, 10, 10));
+		panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 60, 20, 60));
 
 		JButton bVolver  = new JButton("Volver");
 		JButton bJugar   = new JButton("¡Jugar!");
-		JButton bJugar2p = new JButton("Jugar 2 Jugadores");
+		JButton bJugar2p = new JButton("2 Jugadores");
+		JButton bJugarVM = new JButton("vs Máquina");
 
 		bVolver.setFont(new Font("Arial", Font.PLAIN, 16));
 		bJugar.setFont(new Font("Arial", Font.BOLD, 16));
 		bJugar2p.setFont(new Font("Arial", Font.BOLD, 16));
+		bJugarVM.setFont(new Font("Arial", Font.BOLD, 16));
 
 		bVolver.addActionListener(e -> window.goToMenu());
-		bJugar.addActionListener(e -> window.startGame(false));
-		bJugar2p.addActionListener(e -> window.startGame(true));
+		bJugar.addActionListener(e -> window.showColorConfig(GameMode.SOLO));
+		bJugar2p.addActionListener(e -> window.showColorConfig(GameMode.PVP));
+		bJugarVM.addActionListener(e -> window.showColorConfig(GameMode.PVM));
 
 		panelBotones.add(bVolver);
 		panelBotones.add(bJugar);
 		panelBotones.add(bJugar2p);
+		panelBotones.add(bJugarVM);
 		window.add(panelBotones, BorderLayout.SOUTH);
 
 		window.revalidate();
