@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import Controller.Window;
@@ -14,7 +16,8 @@ import View.Vector2D;
 public class TileManager {
 
 	GameState gp;
-	private int[][] mapData;
+	private int[][]    mapData;
+	private String[][] rawData;
 
 	public TileManager(GameState gp, String mapPath) {
 		this.gp = gp;
@@ -26,9 +29,26 @@ public class TileManager {
 			Scanner sc = new Scanner(new File(path));
 			int rows = 25, cols = 33;
 			mapData = new int[rows][cols];
-			for (int row = 0; row < rows; row++)
-				for (int col = 0; col < cols; col++)
-					mapData[row][col] = sc.nextInt();
+			rawData = new String[rows][cols];
+			for (int row = 0; row < rows; row++) {
+				for (int col = 0; col < cols; col++) {
+					String token = sc.next();
+					rawData[row][col] = token;
+					if (token.startsWith("C")) {
+						mapData[row][col] = 200;
+					} else if (token.startsWith("P")) {
+						mapData[row][col] = 201;
+					} else if (token.equals("F")) {
+						mapData[row][col] = 15;
+					} else if (token.equals("G")) {
+						mapData[row][col] = 16;
+					} else if (token.equals("H")) {
+						mapData[row][col] = 17;
+					} else {
+						mapData[row][col] = Integer.parseInt(token, 16);
+					}
+				}
+			}
 			sc.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -54,7 +74,8 @@ public class TileManager {
 				if (type == 2) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 4 || type == 6 || type == 7) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 5) g.drawImage((row + col) % 2 == 0 ? Assets.tilePath1 : Assets.tilePath2, x, y, tileW, tileH, null);
-				if (type >= 8 && type <= 11) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
+				if (type >= 8 && type <= 17) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
+				if (type == 200 || type == 201) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
 			}
 		}
 	}
@@ -81,23 +102,76 @@ public class TileManager {
 	private Vector2D getSpawnPosition(int tileType) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
-		for (int row = 0; row < mapData.length; row++)
-			for (int col = 0; col < mapData[0].length; col++)
-				if (mapData[row][col] == tileType)
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				if (mapData[row][col] == tileType) {
 					return new Vector2D(col * tileW, row * tileH);
+				}
+			}
+		}
 		return new Vector2D(0, 0);
+	}
+
+	public List<int[]> getSkinCoinPositions() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		List<int[]> positions = new ArrayList<>();
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				int t = mapData[row][col];
+				if (t == 15 || t == 16 || t == 17) {
+					positions.add(new int[]{ col * tileW, row * tileH, t });
+				}
+			}
+		}
+		return positions;
 	}
 
 	public List<int[]> getEnemySpawns() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
 		List<int[]> spawns = new ArrayList<>();
-		for (int row = 0; row < mapData.length; row++)
+		for (int row = 0; row < mapData.length; row++) {
 			for (int col = 0; col < mapData[0].length; col++) {
 				int t = mapData[row][col];
-				if (t >= 8 && t <= 11)
+				if (t >= 8 && t <= 14) {
 					spawns.add(new int[]{ col * tileW, row * tileH, t });
+				}
 			}
+		}
+		return spawns;
+	}
+
+	public Map<String, List<Vector2D>> getPatrolGroups() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		Map<String, List<Vector2D>> groups = new HashMap<>();
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				String token = rawData[row][col];
+				if (token != null && token.startsWith("P")) {
+					String group = token.substring(1);
+					groups.computeIfAbsent(group, k -> new ArrayList<>())
+					      .add(new Vector2D(col * tileW, row * tileH));
+				}
+			}
+		}
+		return groups;
+	}
+
+	public Map<String, Vector2D> getPatrolSpawns() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		Map<String, Vector2D> spawns = new HashMap<>();
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				String token = rawData[row][col];
+				if (token != null && token.startsWith("C")) {
+					String group = token.substring(1);
+					spawns.put(group, new Vector2D(col * tileW, row * tileH));
+				}
+			}
+		}
 		return spawns;
 	}
 
@@ -106,8 +180,9 @@ public class TileManager {
 		int tileH = Window.HEIGHT / mapData.length;
 		int col = x / tileW;
 		int row = y / tileH;
-		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length)
+		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length) {
 			return false;
+		}
 		int type = mapData[row][col];
 		return type == 4 || type == 6;
 	}
@@ -117,8 +192,9 @@ public class TileManager {
 		int tileH = Window.HEIGHT / mapData.length;
 		int col = x / tileW;
 		int row = y / tileH;
-		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length)
+		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length) {
 			return false;
+		}
 		return mapData[row][col] == 2;
 	}
 
@@ -128,9 +204,9 @@ public class TileManager {
 		int col = x / tileW;
 		int row = y / tileH;
 
-		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length)
+		if (row < 0 || col < 0 || row >= mapData.length || col >= mapData[0].length) {
 			return true;
-
+		}
 		return mapData[row][col] == 3;
 	}
 }

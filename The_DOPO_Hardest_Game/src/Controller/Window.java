@@ -15,7 +15,9 @@ import View.KeyBoard;
 import model.ColorConfigState;
 import model.GameMode;
 import model.GameState;
+import model.MenuOptionsState;
 import model.MenuState;
+import model.PlayerType;
 import model.PreGameState;
 
 public class Window extends JFrame implements Runnable{
@@ -33,12 +35,14 @@ public class Window extends JFrame implements Runnable{
 	private double delta = 0;
 	private int AVERAGEFPS = FPS;
 
-	private GameState gameState;
-	private MenuState menuState;
-	private KeyBoard keyBoard;
+	private GameState        gameState;
+	private MenuState        menuState;
+	private MenuOptionsState optionsState;
+	private KeyBoard         keyBoard;
 	public static int CANVAS_WIDTH, CANVAS_HEIGHT;
 
-	private boolean inMenu = true;
+	private boolean inMenu    = true;
+	private boolean inOptions = false;
 
 	public Window(){
 
@@ -60,7 +64,7 @@ public class Window extends JFrame implements Runnable{
 		new ColorConfigState(this, mode);
 	}
 
-	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2) {
+	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2) {
 		keyBoard = new KeyBoard();
 
 		canvas = new Canvas();
@@ -80,7 +84,7 @@ public class Window extends JFrame implements Runnable{
 		setLocationRelativeTo(null);
 		repaint();
 
-		gameState = new GameState(this, mode, texture1, texture2);
+		gameState = new GameState(this, mode, texture1, texture2, type1, type2);
 		inMenu = false;
 	}
 
@@ -89,7 +93,9 @@ public class Window extends JFrame implements Runnable{
 	}
 
 	private void update() {
-		if(inMenu) {
+		if (inOptions) {
+			optionsState.update();
+		} else if (inMenu) {
 			menuState.update();
 		} else {
 			keyBoard.update();
@@ -175,9 +181,16 @@ public class Window extends JFrame implements Runnable{
 		new PreGameState(this);
 	}
 
+	public void showOptions() {
+		inMenu    = false;
+		inOptions = true;
+		optionsState = new MenuOptionsState(this);
+	}
+
 	public void goToMenu() {
 		setJMenuBar(null);
-		inMenu = true;
+		inMenu    = true;
+		inOptions = false;
 		menuState = new MenuState(this);
 	}
 }

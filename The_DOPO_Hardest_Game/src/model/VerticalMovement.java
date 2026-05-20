@@ -16,10 +16,11 @@ public class VerticalMovement implements MovementLogic {
 		int x = (int) position.getX();
 		int y = (int) position.getY();
 
-		if (dy > 0 && tileManager.isBlocked(x, y + h + dy))
+		if (dy > 0 && tileManager.isBlocked(x, y + h + dy)) {
 			dy = -dy;
-		else if (dy < 0 && tileManager.isBlocked(x, y + dy))
+		} else if (dy < 0 && tileManager.isBlocked(x, y + dy)) {
 			dy = -dy;
+		}
 
 		return new int[]{ 0, dy };
 	}

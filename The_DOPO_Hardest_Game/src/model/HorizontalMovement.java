@@ -16,10 +16,11 @@ public class HorizontalMovement implements MovementLogic {
 		int x = (int) position.getX();
 		int y = (int) position.getY();
 
-		if (dx > 0 && tileManager.isBlocked(x + w + dx, y))
+		if (dx > 0 && tileManager.isBlocked(x + w + dx, y)) {
 			dx = -dx;
-		else if (dx < 0 && tileManager.isBlocked(x + dx, y))
+		} else if (dx < 0 && tileManager.isBlocked(x + dx, y)) {
 			dx = -dx;
+		}
 
 		return new int[]{ dx, 0 };
 	}

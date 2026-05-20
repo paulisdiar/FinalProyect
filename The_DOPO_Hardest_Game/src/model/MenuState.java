@@ -58,10 +58,13 @@ public class MenuState {
 	public void update(){
 		menuInput.update();
 
-		if(MenuInput.JUGAR) {
+		if (MenuInput.JUGAR) {
 			window.showInstructions();
 		}
-		if(MenuInput.SALIR) {
+		if (MenuInput.OPCIONES) {
+			window.showOptions();
+		}
+		if (MenuInput.SALIR) {
 			System.exit(0);
 		}
 	}

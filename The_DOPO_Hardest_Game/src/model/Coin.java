@@ -13,15 +13,17 @@ public class Coin extends GameObject {
 		super(position, texture);
 	}
 
-	public boolean isCollected(){ 
-		return collected; 
-	}
-	
-	public void collect(){ 
-		collected = true; 
+	public boolean isCollected() {
+		return collected;
 	}
 
-	@Override public void update() {}
+	public void collect() {
+		collected = true;
+	}
+
+	@Override
+	public void update() {
+	}
 
 	@Override
 	public void draw(Graphics g) {

@@ -12,11 +12,19 @@ public class Assets {
 	public static BufferedImage tileGoal;
 
 	public static BufferedImage[] playerColors;
+	public static BufferedImage playerWeakGreen;
+
+	public static BufferedImage coinRed;
+	public static BufferedImage coinBlue;
+	public static BufferedImage coinGreen;
 
 	public static void init() {
 		player    = Loader.ImageLoader("res/players/Player.png");
 		enemy     = Loader.ImageLoader("res/enemies/Enemy.png");
 		coin      = Loader.ImageLoader("res/coin/Coin.png");
+		coinRed   = Loader.ImageLoader("res/coin/red_coin.png");
+		coinBlue  = Loader.ImageLoader("res/coin/blue_coin.png");
+		coinGreen = Loader.ImageLoader("res/coin/green_coin.png");
 		tilePath1 = Loader.ImageLoader("res/tiles/PathTile1.png");
 		tilePath2 = Loader.ImageLoader("res/tiles/PathTile2.png");
 		tileGoal  = Loader.ImageLoader("res/tiles/Finish-Checkpoint_Tile.png");

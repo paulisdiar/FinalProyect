@@ -1,18 +1,26 @@
 package model;
 
-import java.awt.image.BufferedImage;
-
 import View.KeyBoard;
-import View.Vector2D;
 
-public class Player2 extends HumanPlayer {
+public class Player2 implements ControlScheme {
 
-	public Player2(Vector2D position, BufferedImage texture, TileManager tileManager) {
-		super(position, texture, tileManager);
+	@Override
+	public boolean isUp() {
+		return KeyBoard.W;
 	}
 
-	@Override protected boolean isUp()    { return KeyBoard.W; }
-	@Override protected boolean isDown()  { return KeyBoard.S; }
-	@Override protected boolean isLeft()  { return KeyBoard.A; }
-	@Override protected boolean isRight() { return KeyBoard.D; }
+	@Override
+	public boolean isDown() {
+		return KeyBoard.S;
+	}
+
+	@Override
+	public boolean isLeft() {
+		return KeyBoard.A;
+	}
+
+	@Override
+	public boolean isRight() {
+		return KeyBoard.D;
+	}
 }
