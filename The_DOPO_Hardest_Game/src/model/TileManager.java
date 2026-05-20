@@ -184,7 +184,7 @@ public class TileManager {
 			return false;
 		}
 		int type = mapData[row][col];
-		return type == 4 || type == 6;
+		return type == 4;
 	}
 
 	public boolean isGoal(int x, int y) {

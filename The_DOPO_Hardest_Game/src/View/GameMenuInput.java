@@ -5,15 +5,16 @@ import java.awt.event.ActionListener;
 
 public class GameMenuInput implements ActionListener{
 
-	private boolean[] opciones = new boolean[4];
+	private boolean[] opciones = new boolean[5];
 
-	public static boolean GUARDAR, CARGAR, VOLVER_MENU, SALIR;
+	public static boolean GUARDAR, CARGAR, VOLVER_MENU, SALIR, PAUSAR;
 
 	public GameMenuInput() {
-		GUARDAR = false;
-		CARGAR = false;
+		GUARDAR     = false;
+		CARGAR      = false;
 		VOLVER_MENU = false;
-		SALIR = false;
+		SALIR       = false;
+		PAUSAR      = false;
 	}
 
 	public void update() {
@@ -21,11 +22,13 @@ public class GameMenuInput implements ActionListener{
 		CARGAR      = opciones[1];
 		VOLVER_MENU = opciones[2];
 		SALIR       = opciones[3];
+		PAUSAR      = opciones[4];
 
 		opciones[0] = false;
 		opciones[1] = false;
 		opciones[2] = false;
 		opciones[3] = false;
+		opciones[4] = false;
 	}
 
 	@Override
@@ -35,6 +38,7 @@ public class GameMenuInput implements ActionListener{
 			case "Cargar"        -> opciones[1] = true;
 			case "Volver al Menu"-> opciones[2] = true;
 			case "Salir"         -> opciones[3] = true;
+			case "Pausar"        -> opciones[4] = true;
 		}
 	}
 }

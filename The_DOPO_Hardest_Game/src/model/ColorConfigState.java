@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
@@ -41,6 +42,9 @@ public class ColorConfigState {
 	private PlayerType selectedType2 = PlayerType.ROJO;
 	private PlayerType machineType;
 	private int machineColorIndex;
+
+	private JTextField nameField1;
+	private JTextField nameField2;
 
 	public ColorConfigState(Window window, GameMode mode) {
 		this.window = window;
@@ -99,10 +103,19 @@ public class ColorConfigState {
 		JButton bJugar = new JButton("¡Jugar!");
 		bJugar.setFont(new Font("Arial", Font.BOLD, 16));
 		bJugar.addActionListener(e -> {
-			PlayerType pt2   = (mode == GameMode.PVM) ? machineType   : selectedType2;
+			PlayerType pt2   = (mode == GameMode.PVM) ? machineType : selectedType2;
 			BufferedImage t1 = textureFor(selectedType1);
 			BufferedImage t2 = textureFor(pt2);
-			window.startGame(mode, t1, t2, selectedType1, pt2);
+			String n1 = nameField1.getText().trim().isEmpty() ? "Jugador 1" : nameField1.getText().trim();
+			String n2;
+			if (mode == GameMode.PVM) {
+				n2 = "Máquina";
+			} else if (nameField2 != null && !nameField2.getText().trim().isEmpty()) {
+				n2 = nameField2.getText().trim();
+			} else {
+				n2 = "Jugador 2";
+			}
+			window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2);
 		});
 
 		south.add(bVolver);
@@ -114,15 +127,31 @@ public class ColorConfigState {
 	}
 
 	private JPanel buildTypePanel(String label, int playerNum) {
-		JPanel panel = new JPanel(new BorderLayout(5, 12));
+		JPanel panel = new JPanel(new BorderLayout(5, 8));
 		panel.setBorder(BorderFactory.createTitledBorder(
 			BorderFactory.createEtchedBorder(), label,
 			TitledBorder.CENTER, TitledBorder.TOP,
 			new Font("Arial", Font.BOLD, 14)
 		));
 
+		JTextField nameField = new JTextField(playerNum == 1 ? "Jugador 1" : "Jugador 2", 12);
+		nameField.setFont(new Font("Arial", Font.PLAIN, 13));
+		nameField.setHorizontalAlignment(JTextField.CENTER);
+		JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 4));
+		namePanel.add(new JLabel("Nombre: "));
+		namePanel.add(nameField);
+		if (playerNum == 1) {
+			nameField1 = nameField;
+		} else {
+			nameField2 = nameField;
+		}
+
 		JLabel preview = new JLabel(scaledIcon(textureFor(PlayerType.ROJO), 64, 64), SwingConstants.CENTER);
-		preview.setBorder(BorderFactory.createEmptyBorder(12, 0, 8, 0));
+		preview.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+
+		JPanel topPanel = new JPanel(new BorderLayout());
+		topPanel.add(namePanel, BorderLayout.NORTH);
+		topPanel.add(preview, BorderLayout.CENTER);
 
 		JPanel buttons = new JPanel(new GridLayout(1, 3, 8, 0));
 		buttons.setBorder(BorderFactory.createEmptyBorder(4, 12, 16, 12));
@@ -158,7 +187,7 @@ public class ColorConfigState {
 			buttons.add(btn);
 		}
 
-		panel.add(preview, BorderLayout.CENTER);
+		panel.add(topPanel, BorderLayout.CENTER);
 		panel.add(buttons, BorderLayout.SOUTH);
 		return panel;
 	}

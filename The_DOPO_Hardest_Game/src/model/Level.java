@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import Controller.Window;
 import View.Assets;
+import View.KeyBoard;
 import View.Vector2D;
 
 public class Level {
@@ -48,17 +49,23 @@ public class Level {
 
 	private int invincible1 = 0;
 	private int invincible2 = 0;
+	private boolean paused = false;
 
 	private static final int COIN_VALUE      = 10;
 	private static final int INVINCIBLE_TIME = 90;
 
-	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2) {
+	private String name1;
+	private String name2;
+
+	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
 		this.gp              = gp;
 		this.mode            = mode;
 		this.originalType1   = type1;
 		this.originalType2   = type2;
 		this.originalTexture1 = texture1;
 		this.originalTexture2 = texture2;
+		this.name1           = name1;
+		this.name2           = name2;
 		tileManager = new TileManager(gp, mapPath);
 		startP1  = tileManager.getSpawnPlayer1();
 		respawnP1 = new Vector2D(startP1.getX(), startP1.getY());
@@ -245,6 +252,12 @@ public class Level {
 		return count;
 	}
 
+	private boolean onCheckpoint(Player p) {
+		int cx = (int) p.getPosition().getX() + p.getWidth()  / 2;
+		int cy = (int) p.getPosition().getY() + p.getHeight() / 2;
+		return tileManager.isCheckpoint(cx, cy);
+	}
+
 	private void checkPlayerCollision() {
 		if (!hasSecondPlayer()) {
 			return;
@@ -253,6 +266,9 @@ public class Level {
 			return;
 		}
 		if (!getRect(player1).intersects(getRect(player2))) {
+			return;
+		}
+		if (onCheckpoint(player1) || onCheckpoint(player2)) {
 			return;
 		}
 
@@ -292,6 +308,28 @@ public class Level {
 		}
 	}
 
+	private String determinarGanador(int coins1, int coins2, int d1, int d2, boolean p1Goal) {
+		if (mode == GameMode.SOLO) {
+			return "¡Nivel completado!";
+		}
+		if (mode == GameMode.PVP || mode == GameMode.PVM) {
+			if (coins1 > coins2) {
+				return "¡" + name1 + " ganó!";
+			}
+			if (coins2 > coins1) {
+				return "¡" + name2 + " ganó!";
+			}
+			if (d1 < d2) {
+				return "¡" + name1 + " ganó! (empate en monedas, menos muertes)";
+			}
+			if (d2 < d1) {
+				return "¡" + name2 + " ganó! (empate en monedas, menos muertes)";
+			}
+			return "¡Empate!";
+		}
+		return "";
+	}
+
 	private void checkGoal() {
 		if (!allCoinsCollected()) {
 			return;
@@ -304,40 +342,69 @@ public class Level {
 		if (hasSecondPlayer()) {
 			int p2cx = (int) player2.getPosition().getX() + player2.getWidth()  / 2;
 			int p2cy = (int) player2.getPosition().getY() + player2.getHeight() / 2;
-			p2Goal = tileManager.isCheckpoint(p2cx, p2cy);
+			p2Goal = tileManager.isGoal(p2cx, p2cy);
 		}
 		if (!p1Goal && !p2Goal) {
 			return;
 		}
 
 		levelComplete = true;
-		int timeBonus = timerTicks / 60;
-		int total1 = Math.max(0, score1 + timeBonus - deaths1 * 5);
-		int total2 = Math.max(0, score2 + timeBonus - deaths2 * 5);
+		int total1 = Math.max(0, score1 - deaths1 * 5);
+		int total2 = Math.max(0, score2 - deaths2 * 5);
 		int coins1 = score1, coins2 = score2, d1 = deaths1, d2 = deaths2;
-		boolean winner1 = p1Goal;
 
 		SwingUtilities.invokeLater(() -> {
-			String breakdown1 = "  Monedas: +" + coins1 + "  Tiempo: +" + timeBonus + "  Muertes: -" + (d1 * 5) + "  =  " + total1;
-			String breakdown2 = "  Monedas: +" + coins2 + "  Tiempo: +" + timeBonus + "  Muertes: -" + (d2 * 5) + "  =  " + total2;
+			String ganador = determinarGanador(coins1, coins2, d1, d2, p1Goal);
+			String breakdown1 = name1 + ":  Monedas: +" + coins1 + "  Muertes: -" + (d1 * 5) + "  =  " + total1;
+			String breakdown2 = name2 + ":  Monedas: +" + coins2 + "  Muertes: -" + (d2 * 5) + "  =  " + total2;
 
 			String msg;
 			if (mode == GameMode.PVP) {
-				String ganador = winner1 ? "¡Jugador 1 ganó!" : "¡Jugador 2 ganó!";
-				msg = ganador + "\n\nJugador 1:" + breakdown1 + "\nJugador 2:" + breakdown2;
+				msg = ganador + "\n\n" + breakdown1 + "\n" + breakdown2;
 			} else if (mode == GameMode.PVM) {
-				String ganador = winner1 ? "¡Jugador ganó!" : "¡La Máquina ganó!";
-				msg = ganador + "\n\nJugador:" + breakdown1;
+				msg = ganador + "\n\n" + breakdown1;
 			} else {
-				msg = "¡Nivel completado!\n\nPuntaje:" + breakdown1;
+				msg = "¡Nivel completado!\n\n" + breakdown1;
 			}
-			JOptionPane.showMessageDialog(null, msg, "Fin del nivel", JOptionPane.INFORMATION_MESSAGE);
-			gp.getWindow().goToMenu();
+
+			gp.nextLevel(total1, total2);
+
+			if (gp.isLastLevel()) {
+				int grandTotal1 = gp.getAccumulatedScore1();
+				int grandTotal2 = gp.getAccumulatedScore2();
+				String finalMsg = msg + "\n\n--- PUNTAJE FINAL ---\n" + name1 + ": " + grandTotal1;
+				if (mode != GameMode.SOLO) {
+					finalMsg += "\n" + name2 + ": " + grandTotal2;
+				}
+				JOptionPane.showMessageDialog(null, finalMsg, "Juego completado", JOptionPane.INFORMATION_MESSAGE);
+				gp.getWindow().goToMenu();
+			} else {
+				String[] opciones = { "Continuar", "Guardar y continuar", "Volver al menú" };
+				int eleccion = JOptionPane.showOptionDialog(null, msg, "Fin del nivel",
+					JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
+					null, opciones, opciones[0]);
+				if (eleccion == 0) {
+					// ya se llamó nextLevel arriba, el nivel nuevo ya está cargado
+				} else if (eleccion == 1) {
+					gp.optionSavePublic();
+				} else {
+					gp.getWindow().goToMenu();
+				}
+			}
 		});
 	}
 
 	public void update() {
 		if (levelComplete) {
+			return;
+		}
+		if (KeyBoard.ESCAPE_PRESSED) {
+			togglePause();
+		}
+		if (paused) {
+			if (KeyBoard.M_PRESSED) {
+				gp.getWindow().goToMenu();
+			}
 			return;
 		}
 		if (invincible1 > 0) {
@@ -360,6 +427,14 @@ public class Level {
 		checkSkinCoinCollisions();
 		checkGoal();
 		updateTimer();
+	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void togglePause() {
+		paused = !paused;
 	}
 
 	private void updateTimer() {
@@ -447,14 +522,40 @@ public class Level {
 		g.drawString(coinsText, Window.WIDTH - fm.stringWidth(coinsText) - 10, 20);
 
 		if (mode == GameMode.PVP) {
-			g.drawString("J1 — Muertes: " + deaths1, 10, 40);
-			g.drawString("J2 — Muertes: " + deaths2, Window.WIDTH - fm.stringWidth("J2 — Muertes: " + deaths2) - 10, 40);
+			String t1 = name1 + " — Muertes: " + deaths1;
+			String t2 = name2 + " — Muertes: " + deaths2;
+			g.drawString(t1, 10, 40);
+			g.drawString(t2, Window.WIDTH - fm.stringWidth(t2) - 10, 40);
 		} else if (mode == GameMode.PVM) {
-			g.drawString("J — Muertes: " + deaths1, 10, 40);
-			g.drawString("MÁQ — Muertes: " + deaths2, Window.WIDTH - fm.stringWidth("MÁQ — Muertes: " + deaths2) - 10, 40);
+			String t1 = name1 + " — Muertes: " + deaths1;
+			String t2 = name2 + " — Muertes: " + deaths2;
+			g.drawString(t1, 10, 40);
+			g.drawString(t2, Window.WIDTH - fm.stringWidth(t2) - 10, 40);
 		} else {
-			String deathsText = "Muertes: " + deaths1;
+			String deathsText = name1 + " — Muertes: " + deaths1;
 			g.drawString(deathsText, (Window.WIDTH - fm.stringWidth(deathsText)) / 2, 20);
 		}
+
+		if (paused) {
+			drawPauseOverlay(g);
+		}
+	}
+
+	private void drawPauseOverlay(Graphics g) {
+		g.setColor(new Color(0, 0, 0, 140));
+		g.fillRect(0, 0, Window.WIDTH, Window.HEIGHT);
+
+		g.setFont(new Font("Arial", Font.BOLD, 48));
+		FontMetrics fm = g.getFontMetrics();
+		String titulo = "PAUSADO";
+		g.setColor(Color.WHITE);
+		g.drawString(titulo, (Window.WIDTH - fm.stringWidth(titulo)) / 2, Window.HEIGHT / 2 - 40);
+
+		g.setFont(new Font("Arial", Font.PLAIN, 20));
+		fm = g.getFontMetrics();
+		String reanudar = "ESC — Reanudar";
+		String salirMenu = "M — Volver al menú";
+		g.drawString(reanudar,  (Window.WIDTH - fm.stringWidth(reanudar))  / 2, Window.HEIGHT / 2 + 20);
+		g.drawString(salirMenu, (Window.WIDTH - fm.stringWidth(salirMenu)) / 2, Window.HEIGHT / 2 + 50);
 	}
 }

@@ -19,6 +19,7 @@ import model.MenuOptionsState;
 import model.MenuState;
 import model.PlayerType;
 import model.PreGameState;
+import model.SaveData;
 
 public class Window extends JFrame implements Runnable{
 
@@ -64,7 +65,7 @@ public class Window extends JFrame implements Runnable{
 		new ColorConfigState(this, mode);
 	}
 
-	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2) {
+	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
 		keyBoard = new KeyBoard();
 
 		canvas = new Canvas();
@@ -84,8 +85,23 @@ public class Window extends JFrame implements Runnable{
 		setLocationRelativeTo(null);
 		repaint();
 
-		gameState = new GameState(this, mode, texture1, texture2, type1, type2);
+		gameState = new GameState(this, mode, texture1, texture2, type1, type2, name1, name2);
 		inMenu = false;
+		inOptions = false;
+	}
+
+	public void startGameFromSave(SaveData data) {
+		String n1 = (data.name1 != null) ? data.name1 : "Jugador 1";
+		String n2 = (data.name2 != null) ? data.name2 : "Jugador 2";
+		startGame(data.mode,
+			Assets.playerColors[data.textureIndex1],
+			Assets.playerColors[data.textureIndex2],
+			data.type1,
+			data.type2,
+			n1,
+			n2
+		);
+		gameState.applyLoad(data);
 	}
 
 	public static void main(String[] args) {
@@ -105,7 +121,7 @@ public class Window extends JFrame implements Runnable{
 
 	private void draw(){
 
-		if(inMenu) {
+		if(inMenu || inOptions) {
 			return;
 		}
 

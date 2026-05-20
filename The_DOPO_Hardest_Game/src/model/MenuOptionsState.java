@@ -3,18 +3,20 @@ package model;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Controller.Window;
-import View.Assets;
 
 public class MenuOptionsState {
 
@@ -62,19 +64,31 @@ public class MenuOptionsState {
 		}
 	}
 
-	private void load() {
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("save.dat"))) {
+	private void openSaveFile(File archivo) throws GameException {
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
 			SaveData data = (SaveData) ois.readObject();
-			window.startGame(
-				data.mode,
-				Assets.playerColors[data.textureIndex1],
-				Assets.playerColors[data.textureIndex2],
-				data.type1,
-				data.type2
-			);
-			JOptionPane.showMessageDialog(null, "Partida cargada.", "Cargar", JOptionPane.INFORMATION_MESSAGE);
+			window.startGameFromSave(data);
 		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "No se encontró partida guardada.", "Cargar", JOptionPane.WARNING_MESSAGE);
+			throw new GameException("Error al abrir el archivo");
+		}
+	}
+
+	private void load() {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("Archivos de partida (*.dat)", "dat"));
+		int result = chooser.showOpenDialog(window);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			if (!file.getName().toLowerCase().endsWith(".dat")) {
+				JOptionPane.showMessageDialog(window, "El archivo debe tener extensión .dat", "Archivo inválido", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+				openSaveFile(file);
+				JOptionPane.showMessageDialog(window, "Partida cargada.", "Cargar", JOptionPane.INFORMATION_MESSAGE);
+			} catch (GameException e) {
+				JOptionPane.showMessageDialog(window, e.getMessage(), "Error al cargar", JOptionPane.WARNING_MESSAGE);
+			}
 		}
 	}
 }
