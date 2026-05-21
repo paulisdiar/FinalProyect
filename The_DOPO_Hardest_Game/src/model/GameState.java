@@ -53,6 +53,11 @@ public class GameState {
 		initMenu();
 		loadLevel(1);
 	}
+	
+	public GameState() {
+        this.window = null; 
+        this.mode = model.GameMode.SOLO;
+	}
 
 	public boolean isLastLevel() {
 		return currentLevelIndex >= TOTAL_LEVELS;

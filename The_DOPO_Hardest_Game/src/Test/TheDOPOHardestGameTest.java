@@ -43,7 +43,7 @@ public class TheDOPOHardestGameTest {
             @Override public void repaint() {}
         };
 
-        dummyGameState = new GameState(fakeWindow, GameMode.SOLO, dummyTexture, dummyTexture, "J1", "J2");
+        dummyGameState = new GameState(fakeWindow, GameMode.SOLO, dummyTexture, dummyTexture, null, null, "J1", "J2");
 
         freeManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
             @Override public boolean isBlocked(int x, int y)    { return false; }
@@ -52,7 +52,7 @@ public class TheDOPOHardestGameTest {
         };
 
         wallManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
-            @Override public boolean isBlocked(int x, int y)    { return true; }
+        	@Override public boolean isBlocked(int x, int y)    { return true; }
             @Override public boolean isGoal(int x, int y)       { return false; }
             @Override public boolean isCheckpoint(int x, int y) { return false; }
         };
