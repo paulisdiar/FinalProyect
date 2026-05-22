@@ -21,9 +21,14 @@ import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
 
+/**
+ * 
+ */
 public class Window extends JFrame implements Runnable{
 
-	public static final int WIDTH = 800, HEIGHT = 600;
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 600;
+	
 	private Canvas canvas;
 	private Thread thread;
 	private boolean running = false;
@@ -31,16 +36,17 @@ public class Window extends JFrame implements Runnable{
 	private BufferStrategy bs;
 	private Graphics o;
 
-	private final int FPS = 60;
-	private double TARGETTIME = 1000000000/FPS;
+	private static final int FPS = 60;
+	private static final double TARGETTIME = 1000000000/FPS;
 	private double delta = 0;
-	private int AVERAGEFPS = FPS;
+	private static int AVERAGEFPS = FPS;
 
 	private GameState        gameState;
 	private MenuState        menuState;
 	private MenuOptionsState optionsState;
 	private KeyBoard         keyBoard;
-	public static int CANVAS_WIDTH, CANVAS_HEIGHT;
+	public static int CANVAS_HEIGHT;
+	public static int CANVAS_WIDTH;
 
 	private boolean inMenu    = true;
 	private boolean inOptions = false;
