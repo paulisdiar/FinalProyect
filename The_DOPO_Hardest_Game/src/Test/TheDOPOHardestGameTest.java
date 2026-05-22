@@ -26,6 +26,8 @@ import model.VerticalMovement;
 import model.TileManager;
 import model.Tile;
 import model.BluePlayer;
+import model.RedPlayer;
+import model.HumanPlayer;
 import model.GreenPlayer;
 import model.SaveData;
 import model.PlayerType;
@@ -120,6 +122,18 @@ public class TheDOPOHardestGameTest {
 
         Vector2D vacio = new Vector2D();
         assertEquals(0.0, vacio.getX(), 0.001);
+    }
+    
+    @Test
+    public void cobertura_Vector2D() {
+        Vector2D v = new Vector2D(5.0, 10.0);
+        v.setX(12.0);
+        v.setY(24.0);
+        assertEquals(12.0, v.getX(), 0.001);
+        assertEquals(24.0, v.getY(), 0.001);
+        
+        Vector2D vVacio = new Vector2D();
+        assertEquals(0.0, vVacio.getX(), 0.001);
     }
 
     // =========================================================
@@ -335,6 +349,20 @@ public class TheDOPOHardestGameTest {
         gmi.update();
         assertTrue(GameMenuInput.GUARDAR && GameMenuInput.CARGAR && GameMenuInput.VOLVER_MENU && GameMenuInput.SALIR);
     }
+    
+    @Test
+    public void cobertura_GameMenuInput() {
+        GameMenuInput inputMenu = new GameMenuInput();
+        java.awt.Button botonOrigen = new java.awt.Button();
+
+        String[] comandos = {"Guardar", "Cargar", "Volver al Menu", "Salir"};
+        for (String cmd : comandos) {
+            inputMenu.actionPerformed(new ActionEvent(botonOrigen, ActionEvent.ACTION_PERFORMED, cmd));
+            inputMenu.update();
+        }
+
+        assertTrue(GameMenuInput.SALIR);
+    }
 
     // =========================================================
     // Movimientos
@@ -363,6 +391,39 @@ public class TheDOPOHardestGameTest {
         int[] dirWall = rm.getDirection(new Vector2D(50, 50), 16, 16, wallManager);
         assertEquals(0, dirWall[0]);
         assertEquals(0, dirWall[1]);
+    }
+    
+    @Test
+    public void cobertura_RandomMovement() {
+        RandomMovement rm = new RandomMovement();
+        
+        int[] dir1 = rm.getDirection(new Vector2D(50, 50), 16, 16, freeManager);
+        assertNotNull(dir1);
+        
+        int[] dirWall = rm.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
+        assertNotNull(dirWall);
+        
+        try {
+            java.lang.reflect.Field tickerField = RandomMovement.class.getDeclaredField("ticker");
+            tickerField.setAccessible(true);
+            tickerField.setInt(rm, 55); // Supera el CHANGE_INTERVAL
+        } catch (Exception e) {
+        }
+        
+        int[] dirInterval = rm.getDirection(new Vector2D(50, 50), 16, 16, freeManager);
+        assertNotNull(dirInterval);
+    }
+
+    @Test
+    public void cobertura_VerticalMovement() {
+ 
+        VerticalMovement vmDown = new VerticalMovement(1);
+        int[] dirDown = vmDown.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
+        assertTrue(dirDown[1] < 0);
+        
+        VerticalMovement vmUp = new VerticalMovement(-1);
+        int[] dirUp = vmUp.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
+        assertTrue(dirUp[1] > 0);
     }
 
     // =========================================================
@@ -419,8 +480,7 @@ public class TheDOPOHardestGameTest {
         java.awt.Label componenteOrigen = new java.awt.Label();
 
         int[] codigosTeclas = {
-            KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,
-            KeyEvent.VK_W, KeyEvent.VK_A, KeyEvent.VK_S, KeyEvent.VK_D
+            KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_W, KeyEvent.VK_A, KeyEvent.VK_S, KeyEvent.VK_D
         };
 
         for (int codigo : codigosTeclas) {
@@ -433,72 +493,15 @@ public class TheDOPOHardestGameTest {
         assertFalse(KeyBoard.UP);
         assertFalse(KeyBoard.DOWN);
     }
-
-    @Test
-    public void cobertura_GameMenuInput() {
-        GameMenuInput inputMenu = new GameMenuInput();
-        java.awt.Button botonOrigen = new java.awt.Button();
-
-        String[] comandos = {"Guardar", "Cargar", "Volver al Menu", "Salir"};
-        for (String cmd : comandos) {
-            inputMenu.actionPerformed(new ActionEvent(botonOrigen, ActionEvent.ACTION_PERFORMED, cmd));
-            inputMenu.update();
-        }
-
-        assertTrue(GameMenuInput.SALIR);
-    }
-    
- // =========================================================
-    // COBERTURA ADICIONAL: MOVIMIENTOS ALEATORIOS Y VERTICALES
+   
+     
     // =========================================================
-
-    @Test
-    public void testRandomMovement_CambioDireccionYColisiones() {
-        RandomMovement rm = new RandomMovement();
-        
-        // Forzamos un update inicial en espacio libre
-        int[] dir1 = rm.getDirection(new Vector2D(50, 50), 16, 16, freeManager);
-        assertNotNull(dir1);
-        
-        // Forzamos colisión inmediata usando wallManager para activar el método pickDirection()
-        int[] dirWall = rm.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
-        assertNotNull(dirWall);
-        
-        // Simulamos manualmente el ticker usando reflexión para alcanzar el umbral CHANGE_INTERVAL (50)
-        try {
-            java.lang.reflect.Field tickerField = RandomMovement.class.getDeclaredField("ticker");
-            tickerField.setAccessible(true);
-            tickerField.setInt(rm, 55); // Supera el CHANGE_INTERVAL
-        } catch (Exception e) {
-            // Fallback por si la seguridad del entorno restringe la reflexión
-        }
-        
-        int[] dirInterval = rm.getDirection(new Vector2D(50, 50), 16, 16, freeManager);
-        assertNotNull(dirInterval);
-    }
-
-    @Test
-    public void testVerticalMovement_ReboteEnMuros() {
-        // Dirección hacia abajo (1)
-        VerticalMovement vmDown = new VerticalMovement(1);
-        // Al chocar abajo con el wallManager, debe invertir su signo inmediatamente (rebote)
-        int[] dirDown = vmDown.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
-        assertTrue(dirDown[1] < 0);
-        
-        // Dirección hacia arriba (-1)
-        VerticalMovement vmUp = new VerticalMovement(-1);
-        // Al chocar arriba con el wallManager, debe invertir su signo hacia abajo
-        int[] dirUp = vmUp.getDirection(new Vector2D(10, 10), 16, 16, wallManager);
-        assertTrue(dirUp[1] > 0);
-    }
-
-    // =========================================================
-    // COBERTURA ADICIONAL: TILEMANAGER Y LECTURA DE TOKENS MATRICIALES
+    // SaveData
     // =========================================================
 
    
     @Test
-    public void testSaveData_EstructuraYPersistencia() {
+    public void cobertura_SaveData() {
         SaveData data = new SaveData();
         data.mode = GameMode.PVM;
         data.type1 = PlayerType.ROJO;
@@ -512,30 +515,36 @@ public class TheDOPOHardestGameTest {
         assertEquals(150.5f, data.playerX, 0.001);
         assertTrue(data.coinsCollected[0]);
     }
- // =========================================================
-    // HITOS [M1] - MECÁNICAS CORE, MOVIMIENTO Y COLISIONES
+    // =========================================================
+    // MOVIMIENTO Y COLISIONES
     // =========================================================
 
     @Test
-    public void m1_movimientoYColisionBordes() {
-        // Creamos controles reactivos simulados para forzar el movimiento horizontal y vertical
+    public void cobertura_movimientoYColisionBordes() {
         ControlScheme activeControls = new ControlScheme() {
-            public boolean isUp() { return true; }
-            public boolean isDown() { return false; }
-            public boolean isLeft() { return false; }
-            public boolean isRight() { return true; }
+            public boolean isUp() {
+            	return true; 
+            }
+            public boolean isDown() { 
+            	return false; 
+            }
+            public boolean isLeft() { 
+            	return false; 
+            }
+            public boolean isRight() {
+            	return true;
+            }
         };
 
         BluePlayer player = new BluePlayer(new Vector2D(100, 100), dummyTexture, freeManager, activeControls);
         player.update();
         
-        // Verificamos que la posición cambió en diagonal (X aumentó, Y disminuyó)
         assertTrue(player.getPosition().getX() > 100);
         assertTrue(player.getPosition().getY() < 100);
     }
 
     @Test
-    public void m1_colisionJugadorEnemigoYCheckpoint() {
+    public void cobertura_colisionJugadorEnemigoYCheckpoint() {
         Vector2D posInicial = new Vector2D(50, 50);
         Vector2D checkpointActivo = new Vector2D(10, 10);
         
@@ -548,17 +557,17 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void m1_recoleccionMonedasCondicionNivel() {
+    public void cobertura_recoleccionMonedasNivel() {
         Coin coin = new Coin(new Vector2D(10, 10), dummyTexture);
         assertFalse(coin.isCollected());
         
         coin.collect();
         assertTrue(coin.isCollected());
-        coin.update(); // Incrementa cobertura del método update de Coin
+        coin.update(); 
     }
 
     @Test
-    public void m1_timerExpiraYReiniciaNivel() {
+    public void cobertura_tiempo() {
         int tiempoRestante = 0;
         boolean nivelReiniciado = false;
         if (tiempoRestante <= 0) {
@@ -566,13 +575,37 @@ public class TheDOPOHardestGameTest {
         }
         assertTrue(nivelReiniciado);
     }
+    
+    @Test
+    public void MovimientoYColisionPared() {
+        HumanPlayer jugador = new RedPlayer(new Vector2D(32, 32), dummyTexture, freeManager, stubControls);
+        
+        stubControls.isUp();
+        stubControls.isDown();
+        stubControls.isLeft();
+        stubControls.isRight();
+        
+        assertTrue(freeManager.isBlocked(-10, 20));
+        assertTrue(freeManager.isBlocked(20, -10));
+        assertFalse(freeManager.isGoal(-5, -5));
+        assertFalse(freeManager.isCheckpoint(-5, -5));
+    }
+
+    @Test
+    public void ColeccionMonedas() {
+        Coin moneda = new Coin(new Vector2D(64, 64), dummyTexture);
+        assertNotNull(moneda.getPosition());
+        
+        assertFalse(freeManager.isGoal(32, 32));
+        assertFalse(freeManager.isCheckpoint(32, 32));
+    }
 
     // =========================================================
-    // HITOS [M2] - MULTIJUGADOR, INTELIGENCIA Y PUNTAJES
+    // MULTIJUGADOR, INTELIGENCIA Y PUNTAJES
     // =========================================================
 
     @Test
-    public void m2_pvpControlesIndependientes() {
+    public void pvp_ControlesIndependientes() {
         double tiempoJ1 = 40.5;
         double tiempoJ2 = 35.2;
         String ganador = (tiempoJ1 < tiempoJ2) ? "J1" : "J2";
@@ -580,7 +613,7 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void m2_iaAleatoriaDireccionesValidas() {
+    public void pvm_direccionRandom() {
         RandomMovement rm = new RandomMovement();
         int[] dirFree = rm.getDirection(new Vector2D(50, 50), 16, 16, freeManager);
         assertNotNull(dirFree);
@@ -591,44 +624,59 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void m2_calculoPuntajeIndependiente() {
+    public void cobertura_Puntaje() {
         int monedas = 5; int tiempo = 100; int muertes = 1;
         int puntaje = (monedas * 100) + tiempo - (muertes * 50);
         assertEquals(550, puntaje);
     }
+    
+    @Test
+    public void testM2_IaAleatoria_SoloDireccionesValidas() {
+        RandomMovement movAleatorio = new RandomMovement();
+        
+        int[] dirLibre = movAleatorio.getDirection(new Vector2D(32, 32), 16, 16, freeManager);
+        assertNotNull(dirLibre);
+
+        int[] dirMuro = movAleatorio.getDirection(new Vector2D(16, 16), 16, 16, wallManager);
+        assertNotNull(dirMuro);
+
+        try {
+            java.lang.reflect.Field tickerField = RandomMovement.class.getDeclaredField("ticker");
+            tickerField.setAccessible(true);
+            tickerField.setInt(movAleatorio, 55);
+        } catch (Exception e) {}
+        
+        int[] dirIntervalo = movAleatorio.getDirection(new Vector2D(32, 32), 16, 16, freeManager);
+        assertNotNull(dirIntervalo);
+    }
 
     // =========================================================
-    // HITOS [M3] - ATRIBUTOS, ESPECIFICACIONES DE JUGADORES Y ENEMIGOS
+    //  JUGADORES 
     // =========================================================
 
     @Test
-    public void m3_jugadorAzulModificadores() {
+    public void jugadorAzul_tamaño() {
         BluePlayer azul = new BluePlayer(new Vector2D(0, 0), dummyTexture, freeManager, stubControls);
         
-        // Verifica los multiplicadores de escala (1.5x) sobre el ancho y alto de la textura
         assertEquals((int)(dummyTexture.getWidth() * 1.5f), azul.getWidth());
         assertEquals((int)(dummyTexture.getHeight() * 1.5f), azul.getHeight());
     }
 
     @Test
-    public void m3_jugadorVerdeAbsorbHitYVelocidad() {
+    public void jugadorVerde_VelocidadEscudo() {
         GreenPlayer verde = new GreenPlayer(new Vector2D(0, 0), dummyTexture, freeManager, stubControls);
         
-        // El primer impacto debe ser absorbido por el escudo
         assertTrue(verde.absorbHit());
-        
-        // El segundo impacto debe retornar falso (escudo roto, el jugador muere)
         assertFalse(verde.absorbHit());
-        
-        verde.onRespawn(); // Cobertura de restauración
+        verde.onRespawn(); 
     }
 
     // =========================================================
-    // HITOS [M4] - PERSISTENCIA (GUARDAR / CARGAR) E ITEMS
+    // PERSISTENCIA 
     // =========================================================
 
     @Test
-    public void m4_guardarYCargarPersistencia() {
+    public void guardarYCargarPersistencia() {
         int nivelGuardado = 2;
         boolean monedaRecogida = true;
         
@@ -638,19 +686,23 @@ public class TheDOPOHardestGameTest {
         assertEquals(2, nivelCargado);
         assertFalse(monedaReaparece);
     }
-
+    
+    // =========================================================
+    //Bomba
+    // =========================================================
+    
     @Test
-    public void m4_itemsEspecialesVidaBomba() {
+    public void cobertura_VidaBomba() {
         int vidas = 3;
-        vidas++; // Efecto Fuente de Vida
+        vidas++; 
         assertEquals(4, vidas);
 
         boolean bombaActivada = true;
-        assertTrue(bombaActivada); // Efecto Destrucción
+        assertTrue(bombaActivada); 
     }
 
     // =========================================================
-    // COBERTURA COMPLEMENTARIA (ENUMS Y ENTRADAS)
+    //GameMode
     // =========================================================
 
     @Test
@@ -659,6 +711,10 @@ public class TheDOPOHardestGameTest {
         assertEquals(GameMode.SOLO, GameMode.valueOf("SOLO"));
     }
 
+    // =========================================================
+    //Botones
+    // =========================================================
+    
     @Test
     public void cobertura_InputsYAcciones() {
         MenuInput mi = new MenuInput();
@@ -677,25 +733,14 @@ public class TheDOPOHardestGameTest {
         assertTrue(GameMenuInput.GUARDAR);
     }
 
-    @Test
-    public void cobertura_Vector2D() {
-        Vector2D v = new Vector2D(5.0, 10.0);
-        v.setX(12.0);
-        v.setY(24.0);
-        assertEquals(12.0, v.getX(), 0.001);
-        assertEquals(24.0, v.getY(), 0.001);
-        
-        Vector2D vVacio = new Vector2D();
-        assertEquals(0.0, vVacio.getX(), 0.001);
-    }
+   
  // =========================================================
-    // CONDICIONALES DE BORDES EN TILEMANAGER Y EXCEPCIONES
+    // TILEMANAGER 
     // =========================================================
     @Test
     public void testTileManager_LimitesExtremos() {
         TileManager customManager = new TileManager(dummyGameState, "res/maps/level1.txt");
         
-        // Forzamos coordenadas fuera de los índices de la matriz para cubrir las cláusulas 'if' protectoras
         assertTrue(customManager.isBlocked(-5, 10));
         assertTrue(customManager.isBlocked(10, -5));
         assertFalse(customManager.isCheckpoint(-1, -1));
@@ -705,5 +750,14 @@ public class TheDOPOHardestGameTest {
         t.image = dummyTexture;
         t.collision = true;
         assertTrue(t.collision);
+    }
+    
+    @Test
+    public void testTile_EstructuraSimple() {
+        Tile casilla = new Tile();
+        casilla.image = dummyTexture;
+        casilla.collision = true;
+        assertTrue(casilla.collision);
+        assertNotNull(casilla.image);
     }
 }
