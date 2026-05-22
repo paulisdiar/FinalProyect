@@ -82,35 +82,35 @@ public class TheDOPOHardestGameTest {
     // =========================================================
 
     @Test
-    public void vector2D_constructorXY() {
+    public void vector2DConstructorXY() {
         Vector2D v = new Vector2D(3.5, 7.2);
         assertEquals(3.5, v.getX(), 0.001);
         assertEquals(7.2, v.getY(), 0.001);
     }
 
     @Test
-    public void vector2D_constructor() {
+    public void vector2DConstructor() {
         Vector2D v = new Vector2D();
         assertEquals(0.0, v.getX(), 0.001);
         assertEquals(0.0, v.getY(), 0.001);
     }
 
     @Test
-    public void vector2D_setX() {
+    public void vector2DSetX() {
         Vector2D v = new Vector2D(1, 1);
         v.setX(99.9);
         assertEquals(99.9, v.getX(), 0.001);
     }
 
     @Test
-    public void vector2D_setY() {
+    public void vector2DSetY() {
         Vector2D v = new Vector2D(1, 1);
         v.setY(-5.5);
         assertEquals(-5.5, v.getY(), 0.001);
     }
 
     @Test
-    public void vector2D_operaciones() {
+    public void vector2DOperaciones() {
         Vector2D v = new Vector2D(3.5, 7.2);
         assertEquals(3.5, v.getX(), 0.001);
         assertEquals(7.2, v.getY(), 0.001);
@@ -125,7 +125,7 @@ public class TheDOPOHardestGameTest {
     }
     
     @Test
-    public void cobertura_Vector2D() {
+    public void coberturaVector2D() {
         Vector2D v = new Vector2D(5.0, 10.0);
         v.setX(12.0);
         v.setY(24.0);
@@ -141,20 +141,20 @@ public class TheDOPOHardestGameTest {
     // =========================================================
 
     @Test
-    public void coin_nuevaMoneda() {
+    public void coinNuevaMoneda() {
         Coin coin = new Coin(new Vector2D(10, 10), dummyTexture);
         assertFalse(coin.isCollected());
     }
 
     @Test
-    public void coin_collect() {
+    public void coinCollect() {
         Coin coin = new Coin(new Vector2D(10, 10), dummyTexture);
         coin.collect();
         assertTrue(coin.isCollected());
     }
 
     @Test
-    public void coin_collectDouble() {
+    public void coinCollectDouble() {
         Coin coin = new Coin(new Vector2D(0, 0), dummyTexture);
         coin.collect();
         coin.collect();
@@ -162,13 +162,13 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void coin_update() {
+    public void coinUpdate() {
         Coin coin = new Coin(new Vector2D(5, 5), dummyTexture);
         coin.update();
     }
 
     @Test
-    public void coin_getPosition() {
+    public void coinGetPosition() {
         Vector2D pos = new Vector2D(20, 30);
         Coin coin = new Coin(pos, dummyTexture);
         assertEquals(20.0, coin.getPosition().getX(), 0.001);
@@ -176,7 +176,7 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void coin_CiclosYRecoleccion() {
+    public void coinCiclosYRecoleccion() {
         Coin c = new Coin(new Vector2D(5, 5), dummyTexture);
         c.update();
         assertFalse(c.isCollected());
@@ -190,22 +190,22 @@ public class TheDOPOHardestGameTest {
     // =========================================================
 
     @Test
-    public void gameMode_tieneExactamenteTresValores() {
+    public void gameModeTieneExactamenteTresValores() {
         assertEquals(3, GameMode.values().length);
     }
 
     @Test
-    public void gameMode_retornaSolo() {
+    public void gameModeRetornaSolo() {
         assertEquals(GameMode.SOLO, GameMode.valueOf("SOLO"));
     }
 
     @Test
-    public void gameMode_retornaPvp() {
+    public void gameModeRetornaPvp() {
         assertEquals(GameMode.PVP, GameMode.valueOf("PVP"));
     }
 
     @Test
-    public void gameMode_retornaPvm() {
+    public void gameModeRetornaPvm() {
         assertEquals(GameMode.PVM, GameMode.valueOf("PVM"));
     }
 
@@ -214,7 +214,7 @@ public class TheDOPOHardestGameTest {
     // =========================================================
 
     @Test
-    public void keyboard_constructor() {
+    public void keyboardConstructor() {
         new KeyBoard();
         assertFalse(KeyBoard.UP);
         assertFalse(KeyBoard.DOWN);

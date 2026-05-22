@@ -19,15 +19,15 @@ public class Assets {
 	public static BufferedImage coinGreen;
 
 	public static void init() {
-		player    = Loader.ImageLoader("res/players/Player.png");
-		enemy     = Loader.ImageLoader("res/enemies/Enemy.png");
-		coin      = Loader.ImageLoader("res/coin/Coin.png");
-		coinRed   = Loader.ImageLoader("res/coin/red_coin.png");
-		coinBlue  = Loader.ImageLoader("res/coin/blue_coin.png");
-		coinGreen = Loader.ImageLoader("res/coin/green_coin.png");
-		tilePath1 = Loader.ImageLoader("res/tiles/PathTile1.png");
-		tilePath2 = Loader.ImageLoader("res/tiles/PathTile2.png");
-		tileGoal  = Loader.ImageLoader("res/tiles/Finish-Checkpoint_Tile.png");
+		player    = Loader.imageLoader("res/players/Player.png");
+		enemy     = Loader.imageLoader("res/enemies/Enemy.png");
+		coin      = Loader.imageLoader("res/coin/Coin.png");
+		coinRed   = Loader.imageLoader("res/coin/red_coin.png");
+		coinBlue  = Loader.imageLoader("res/coin/blue_coin.png");
+		coinGreen = Loader.imageLoader("res/coin/green_coin.png");
+		tilePath1 = Loader.imageLoader("res/tiles/PathTile1.png");
+		tilePath2 = Loader.imageLoader("res/tiles/PathTile2.png");
+		tileGoal  = Loader.imageLoader("res/tiles/Finish-Checkpoint_Tile.png");
 
 		String[] colorFiles = {
 			"player_red", "player_blue", "player_green", "player_yellow",
@@ -35,6 +35,6 @@ public class Assets {
 		};
 		playerColors = new BufferedImage[colorFiles.length];
 		for (int i = 0; i < colorFiles.length; i++)
-			playerColors[i] = Loader.ImageLoader("res/players/" + colorFiles[i] + ".png");
+			playerColors[i] = Loader.imageLoader("res/players/" + colorFiles[i] + ".png");
 	}
 }
