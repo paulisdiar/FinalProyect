@@ -501,7 +501,7 @@ public class TheDOPOHardestGameTest {
 
    
     @Test
-    public void cobertura_SaveData() {
+    public void coberturaSaveData() {
         SaveData data = new SaveData();
         data.mode = GameMode.PVM;
         data.type1 = PlayerType.ROJO;
@@ -520,7 +520,7 @@ public class TheDOPOHardestGameTest {
     // =========================================================
 
     @Test
-    public void cobertura_movimientoYColisionBordes() {
+    public void coberturaMovimientoYColisionBordes() {
         ControlScheme activeControls = new ControlScheme() {
             public boolean isUp() {
             	return true; 
@@ -544,7 +544,7 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void cobertura_colisionJugadorEnemigoYCheckpoint() {
+    public void coberturaColisionJugadorEnemigoYCheckpoint() {
         Vector2D posInicial = new Vector2D(50, 50);
         Vector2D checkpointActivo = new Vector2D(10, 10);
         
@@ -557,7 +557,7 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void cobertura_recoleccionMonedasNivel() {
+    public void coberturaRecoleccionMonedasNivel() {
         Coin coin = new Coin(new Vector2D(10, 10), dummyTexture);
         assertFalse(coin.isCollected());
         
@@ -567,7 +567,7 @@ public class TheDOPOHardestGameTest {
     }
 
     @Test
-    public void cobertura_tiempo() {
+    public void coberturaTiempo() {
         int tiempoRestante = 0;
         boolean nivelReiniciado = false;
         if (tiempoRestante <= 0) {
