@@ -1,9 +1,10 @@
 package model;
 
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 
-import View.Vector2D;
+import view.Vector2D;
 
 /**
  * Clase abstracta raíz de toda la jerarquía de entidades del juego.

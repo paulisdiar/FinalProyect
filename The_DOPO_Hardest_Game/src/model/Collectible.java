@@ -1,9 +1,10 @@
 package model;
 
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 
-import View.Vector2D;
+import view.Vector2D;
 
 /**
  * Clase abstracta que representa cualquier objeto coleccionable del nivel.
@@ -41,6 +42,7 @@ public abstract class Collectible extends GameEntity {
      */
     @Override
     public void update() {
+    	// No-op: Los coleccionables estáticos no requieren lógica en cada tick por defecto
     }
 
     /**

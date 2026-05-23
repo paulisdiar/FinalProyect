@@ -17,9 +17,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Controller.Window;
-import View.Assets;
-import View.GameMenuInput;
+import controller.Window;
+import view.Assets;
+import view.GameMenuInput;
 
 /**
  * Estado central de la partida en curso. Gestiona la carga de niveles,

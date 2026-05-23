@@ -1,8 +1,14 @@
 package model;
 
 import java.io.FileWriter;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,12 +32,19 @@ public class GameLogger {
      * @param message  detalle del error
      */
     public static void logError(String scenario, String message) {
-        new java.io.File("logs").mkdirs();
-        String entry = "[" + LocalDateTime.now().format(FMT) + "] [ERROR] [" + scenario + "] " + message;
-        try (PrintWriter pw = new PrintWriter(new FileWriter(LOG_FILE, true))) {
-            pw.println(entry);
+    	new java.io.File("logs").mkdirs();
+        String entry = "[" + LocalDateTime.now().format(FMT) + "] [INFO] [" + scenario + "] " + message;
+        
+        Path path = Paths.get(LOG_FILE);
+        try (java.io.BufferedWriter loggerWriter = Files.newBufferedWriter(
+                path, 
+                StandardCharsets.UTF_8, 
+                StandardOpenOption.CREATE, 
+                StandardOpenOption.APPEND)) {
+            loggerWriter.write(entry);
+            loggerWriter.newLine();
         } catch (IOException e) {
-            System.err.println("GameLogger: no se pudo escribir en " + LOG_FILE + " — " + e.getMessage());
+            System.err.println("GameLogger: no se pudo escribir en " + LOG_FILE + " - " + e.getMessage());
         }
     }
 
@@ -42,12 +55,19 @@ public class GameLogger {
      * @param message  detalle del evento
      */
     public static void logInfo(String scenario, String message) {
-        new java.io.File("logs").mkdirs();
-        String entry = "[" + LocalDateTime.now().format(FMT) + "] [INFO]  [" + scenario + "] " + message;
-        try (PrintWriter pw = new PrintWriter(new FileWriter(LOG_FILE, true))) {
-            pw.println(entry);
+    	new java.io.File("logs").mkdirs();
+        String entry = "[" + LocalDateTime.now().format(FMT) + "] [INFO] [" + scenario + "] " + message;
+        
+        Path path = Paths.get(LOG_FILE);
+        try (java.io.BufferedWriter loggerWriter = Files.newBufferedWriter(
+                path, 
+                StandardCharsets.UTF_8, 
+                StandardOpenOption.CREATE, 
+                StandardOpenOption.APPEND)) {
+            loggerWriter.write(entry);
+            loggerWriter.newLine();
         } catch (IOException e) {
-            System.err.println("GameLogger: no se pudo escribir en " + LOG_FILE + " — " + e.getMessage());
+            System.err.println("GameLogger: no se pudo escribir en " + LOG_FILE + " - " + e.getMessage());
         }
     }
 }

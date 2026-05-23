@@ -1,20 +1,16 @@
 package model;
 
-import View.Vector2D;
+import view.Vector2D;
 
-<<<<<<< HEAD
 @FunctionalInterface
-=======
+
 /**
  * Estrategia de movimiento para entidades del juego (enemigos, máquina).
  * Cada implementación encapsula un comportamiento distinto.
  */
->>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 public interface MovementLogic {
 
-<<<<<<< HEAD
 	int[] getDirection(Vector2D position, int width, int height, TileManager tileManager);
-=======
 	/**
 	 * Calcula el desplazamiento a aplicar en este frame.
 	 *
@@ -25,5 +21,4 @@ public interface MovementLogic {
 	 * @return arreglo {@code [dx, dy]} con el desplazamiento horizontal y vertical
 	 */
 	int[] getDirection(Vector2D position, int w, int h, TileManager tileManager);
->>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 }

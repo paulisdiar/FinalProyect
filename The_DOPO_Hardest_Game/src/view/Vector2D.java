@@ -1,4 +1,4 @@
-package View;
+package view;
 
 /**
  * Vector bidimensional de punto flotante para representar posiciones

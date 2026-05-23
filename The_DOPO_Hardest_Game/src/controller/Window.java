@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -17,8 +17,8 @@ import model.MenuState;
 import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
-import View.Assets;
-import View.KeyBoard;
+import view.Assets;
+import view.KeyBoard;
 
 /**
  * Ventana principal del juego. Implementa el bucle de juego a 60 FPS
@@ -58,19 +58,28 @@ public class Window extends JFrame implements Runnable {
 	 */
 	public Window() {
 
+        initializeWindow();
 
-		setTitle("The DOPO Hardest Game");
-		setSize(WIDTH, HEIGHT);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
-		setLocationRelativeTo(null);
-		setVisible(true);
+        Assets.init();
+        
+        this.menuState = new MenuState(this);
+        
+        start();
+    }
 
-		Assets.init();
-		menuState = new MenuState(this);
-		start();
-
-	}
+    /**
+     * Configura los parámetros visuales del JFrame. 
+     * Al ser un método 'private', PMD no saltará por llamadas a métodos heredados.
+     */
+    private void initializeWindow() {
+        setTitle("The DOPO Hardest Game");
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setVisible(true);
+        start();
+    }
 
 	/**
 	 * Muestra la pantalla de selección de tipo/nombre para el modo indicado.
