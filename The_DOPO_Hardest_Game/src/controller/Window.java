@@ -68,7 +68,7 @@ public class Window extends JFrame implements Runnable {
     }
 
     /**
-     * Configura los parámetros visuales del JFrame. 
+     * Configura los parámetros visuales del JFrame.
      * Al ser un método 'private', PMD no saltará por llamadas a métodos heredados.
      */
     private void initializeWindow() {
@@ -116,6 +116,33 @@ public class Window extends JFrame implements Runnable {
 	 * @param name2      nombre del Jugador 2 o máquina
 	 * @param startLevel nivel inicial (1-3)
 	 */
+	/**
+	 * Variante con modo experto explícito para IA BFS en modo PVM.
+	 *
+	 * @param expertMode {@code true} activa {@link model.ExpertMovement} en la máquina
+	 */
+	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel, boolean expertMode) {
+		keyBoard = new KeyBoard();
+		canvas = new Canvas();
+		canvas.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		canvas.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+		canvas.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+		canvas.setFocusable(true);
+		getContentPane().removeAll();
+		setLayout(new BorderLayout());
+		add(canvas);
+		canvas.addKeyListener(keyBoard);
+		revalidate();
+		pack();
+		CANVAS_WIDTH = canvas.getWidth();
+		CANVAS_HEIGHT = canvas.getHeight();
+		setLocationRelativeTo(null);
+		repaint();
+		gameState = new GameState(this, mode, texture1, texture2, type1, type2, name1, name2, startLevel, expertMode);
+		inMenu = false;
+		inOptions = false;
+	}
+
 	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel) {
 		keyBoard = new KeyBoard();
 

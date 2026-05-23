@@ -45,6 +45,7 @@ public class GameState {
 
 	private int accumulatedScore1 = 0;
 	private int accumulatedScore2 = 0;
+	private boolean expertMode = false;
 
 	/**
 	 * Crea el estado de juego, inicializa el menú y carga el primer nivel.
@@ -76,6 +77,15 @@ public class GameState {
 	 * @param startLevel nivel inicial (1-3)
 	 */
 	public GameState(Window window, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel) {
+		this(window, mode, texture1, texture2, type1, type2, name1, name2, startLevel, false);
+	}
+
+	/**
+	 * Crea el estado de juego con control de modo experto para la máquina.
+	 *
+	 * @param expertMode {@code true} activa IA experta (BFS) en modo PVM
+	 */
+	public GameState(Window window, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel, boolean expertMode) {
 		this.window = window;
 		this.mode = mode;
 		this.texture1 = texture1;
@@ -84,6 +94,7 @@ public class GameState {
 		this.type2 = type2;
 		this.name1 = name1;
 		this.name2 = name2;
+		this.expertMode = expertMode;
 		this.TOTAL_LEVELS = LevelRegistry.countLevels(mode != GameMode.SOLO);
 		gameMenuInput = new GameMenuInput();
 		initMenu();
@@ -170,7 +181,7 @@ public class GameState {
 		}
 		String suffix = (mode == GameMode.SOLO) ? ".txt" : "_2p.txt";
 		String map = "res/maps/level" + index + suffix;
-		currentLevel = new Level(this, map, mode, texture1, texture2, type1, type2, name1, name2);
+		currentLevel = new Level(this, map, mode, texture1, texture2, type1, type2, name1, name2, expertMode);
 	}
 
 	/**

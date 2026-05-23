@@ -81,6 +81,15 @@ public class Level {
 	 * @param name2    nombre del Jugador 2 o máquina
 	 */
 	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
+		this(gp, mapPath, mode, texture1, texture2, type1, type2, name1, name2, false);
+	}
+
+	/**
+	 * Crea el nivel con control explícito sobre el modo experto de la máquina.
+	 *
+	 * @param expertMode {@code true} para usar {@link ExpertMovement} (BFS), {@code false} para {@link RandomMovement}
+	 */
+	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, boolean expertMode) {
 		this.gp              = gp;
 		this.mode            = mode;
 		this.originalType1   = type1;
@@ -99,7 +108,10 @@ public class Level {
 			if (mode == GameMode.PVP) {
 				player2 = createHumanPlayer(type2, new Vector2D(startP2.getX(), startP2.getY()), texture2, new Player2());
 			} else {
-				player2 = new MachinePlayer(new Vector2D(startP2.getX(), startP2.getY()), texture2, tileManager, new RandomMovement());
+				MovementLogic ml = expertMode
+					? new ExpertMovement(this)
+					: new RandomMovement();
+				player2 = new MachinePlayer(new Vector2D(startP2.getX(), startP2.getY()), texture2, tileManager, ml);
 			}
 		}
 		initEnemies();
@@ -873,6 +885,39 @@ public class Level {
 			g.drawString(inv, ix, 18);
 		}
 		g.setColor(Color.BLACK);
+	}
+
+	/**
+	 * @return lista de monedas amarillas activas (no recogidas) del nivel.
+	 *         Usada por {@link ExpertMovement} para calcular el objetivo BFS.
+	 */
+	public List<Coin> getActiveCoins() {
+		List<Coin> active = new ArrayList<>();
+		for (Coin c : coins) {
+			if (!c.isCollected()) {
+				active.add(c);
+			}
+		}
+		return active;
+	}
+
+	/**
+	 * @return posición actual del jugador máquina (player2), o (0,0) si no existe.
+	 *         Usada por {@link ExpertMovement} para calcular distancias al objetivo.
+	 */
+	public Vector2D getMachinePosition() {
+		if (player2 != null) {
+			return player2.getPosition();
+		}
+		return new Vector2D(0, 0);
+	}
+
+	/**
+	 * @return lista de enemigos activos del nivel.
+	 *         Usada por {@link ExpertMovement} para evitar celdas con enemigos.
+	 */
+	public List<Enemy> getEnemies() {
+		return enemies;
 	}
 
 	/**

@@ -46,6 +46,7 @@ public class ColorConfigState {
 	private PlayerType selectedType2 = PlayerType.ROJO;
 	private PlayerType machineType;
 	private int machineColorIndex;
+	private boolean expertMachine = false;
 
 	private JTextField nameField1;
 	private JTextField nameField2;
@@ -148,7 +149,11 @@ public class ColorConfigState {
 				n2 = "Jugador 2";
 			}
 			int startLevel = levelSelector.getSelectedIndex() + 1;
-			window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2, startLevel);
+			if (mode == GameMode.PVM && expertMachine) {
+				window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2, startLevel, true);
+			} else {
+				window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2, startLevel);
+			}
 		});
 
 		south.add(bVolver);
@@ -235,13 +240,13 @@ public class ColorConfigState {
 	}
 
 	/**
-	 * Construye el panel informativo de la máquina en modo PVM,
-	 * mostrando su tipo y color generados aleatoriamente.
+	 * Construye el panel de la máquina en modo PVM.
+	 * Muestra la vista previa y permite elegir entre IA aleatoria e IA experta (BFS).
 	 *
-	 * @return panel Swing con la vista previa de la máquina
+	 * @return panel Swing con la vista previa y los botones de dificultad
 	 */
 	private JPanel buildMachinePanel() {
-		JPanel panel = new JPanel(new BorderLayout(5, 12));
+		JPanel panel = new JPanel(new BorderLayout(5, 8));
 		panel.setBorder(BorderFactory.createTitledBorder(
 			BorderFactory.createEtchedBorder(), "Máquina",
 			TitledBorder.CENTER, TitledBorder.TOP,
@@ -249,17 +254,44 @@ public class ColorConfigState {
 		));
 
 		JLabel preview = new JLabel(scaledIcon(Assets.playerColors[machineColorIndex], 64, 64), SwingConstants.CENTER);
-		preview.setBorder(BorderFactory.createEmptyBorder(12, 0, 8, 0));
+		preview.setBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0));
 
 		JLabel lbl = new JLabel(
 			"<html><center>Tipo y color aleatorio<br>(generados automáticamente)</center></html>",
 			SwingConstants.CENTER
 		);
-		lbl.setFont(new Font("Arial", Font.ITALIC, 13));
-		lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+		lbl.setFont(new Font("Arial", Font.ITALIC, 12));
+		lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
 
-		panel.add(preview, BorderLayout.CENTER);
-		panel.add(lbl, BorderLayout.SOUTH);
+		// Botones de dificultad IA
+		JPanel diffPanel = new JPanel(new GridLayout(2, 1, 4, 6));
+		diffPanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 12, 12));
+
+		ButtonGroup diffGroup = new ButtonGroup();
+
+		JToggleButton btnAleatoria = new JToggleButton("IA Aleatoria");
+		btnAleatoria.setFont(new Font("Arial", Font.PLAIN, 13));
+		btnAleatoria.setToolTipText("La máquina elige una dirección válida al azar");
+		btnAleatoria.setSelected(true);
+		btnAleatoria.addActionListener(e -> expertMachine = false);
+
+		JToggleButton btnExperta = new JToggleButton("IA Experta (BFS)");
+		btnExperta.setFont(new Font("Arial", Font.BOLD, 13));
+		btnExperta.setForeground(new java.awt.Color(130, 0, 0));
+		btnExperta.setToolTipText("La máquina usa pathfinding BFS hacia monedas y meta, evitando enemigos");
+		btnExperta.addActionListener(e -> expertMachine = true);
+
+		diffGroup.add(btnAleatoria);
+		diffGroup.add(btnExperta);
+		diffPanel.add(btnAleatoria);
+		diffPanel.add(btnExperta);
+
+		JPanel top = new JPanel(new BorderLayout());
+		top.add(preview, BorderLayout.CENTER);
+		top.add(lbl, BorderLayout.SOUTH);
+
+		panel.add(top, BorderLayout.CENTER);
+		panel.add(diffPanel, BorderLayout.SOUTH);
 		return panel;
 	}
 

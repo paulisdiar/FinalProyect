@@ -24,7 +24,7 @@ public abstract class Obstacle extends GameEntity {
      */
     @Override
     public void update() {
-    	// No-op: Los coleccionables estáticos no requieren lógica en cada tick por defecto
+    	// No-op: Los obstáculos estáticos no requieren lógica en cada tick por defecto
     }
 
     /**
