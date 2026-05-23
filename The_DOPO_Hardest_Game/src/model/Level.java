@@ -13,10 +13,10 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import Controller.Window;
-import View.Assets;
-import View.KeyBoard;
-import View.Vector2D;
+import controller.Window;
+import view.Assets;
+import view.KeyBoard;
+import view.Vector2D;
 
 public class Level {
 

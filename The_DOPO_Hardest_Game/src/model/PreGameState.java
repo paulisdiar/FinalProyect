@@ -16,7 +16,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import Controller.Window;
+import controller.Window;
 
 public class PreGameState {
 

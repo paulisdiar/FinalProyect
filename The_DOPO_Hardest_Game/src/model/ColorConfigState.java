@@ -20,8 +20,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import Controller.Window;
-import View.Assets;
+import controller.Window;
+import view.Assets;
 
 public class ColorConfigState {
 

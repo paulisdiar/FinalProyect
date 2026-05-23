@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import View.Vector2D;
+import view.Vector2D;
 
 public class RandomMovement implements MovementLogic {
 

@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,10 +17,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Controller.Window;
-import View.Assets;
-import View.GameMenuInput;
+import controller.Window;
+import view.Assets;
+import view.GameMenuInput;
 
+import java.nio.file.Files;
 public class GameState {
 
 	private static final int TOTAL_LEVELS = 3;
@@ -107,19 +109,19 @@ public class GameState {
 		data.textureIndex2 = typeToIndex(type2);
 		data.name1         = name1;
 		data.name2         = name2;
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
-			oos.writeObject(data);
+		try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(archivo.toPath()))) {
+		    oos.writeObject(data);
 		} catch (IOException e) {
-			throw new GameException("Error al guardar el archivo");
+		    throw new GameException("Error al guardar el archivo");
 		}
 	}
 
 	private void open(File archivo) throws GameException {
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
-			SaveData data = (SaveData) ois.readObject();
-			applyLoad(data);
+		try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(archivo.toPath()))) {
+		    SaveData data = (SaveData) ois.readObject();
+		    applyLoad(data);
 		} catch (IOException | ClassNotFoundException e) {
-			throw new GameException("Error al abrir el archivo");
+		    throw new GameException("Error al abrir el archivo");
 		}
 	}
 

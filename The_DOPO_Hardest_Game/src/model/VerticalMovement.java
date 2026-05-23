@@ -1,6 +1,6 @@
 package model;
 
-import View.Vector2D;
+import view.Vector2D;
 
 public class VerticalMovement implements MovementLogic {
 

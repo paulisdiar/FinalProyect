@@ -6,8 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import View.Assets;
-import View.Vector2D;
+import view.Assets;
+import view.Vector2D;
 
 public class GreenPlayer extends HumanPlayer {
 

@@ -1,4 +1,4 @@
-package Test;
+package test;
 
 import static org.junit.Assert.*;
 
@@ -9,12 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import Controller.Window;
-import View.GameMenuInput;
-import View.KeyBoard;
-import View.MenuInput;
-import View.PreGameInput;
-import View.Vector2D;
+import controller.Window;
 import model.BasicEnemy;
 import model.Coin;
 import model.GameMode;
@@ -23,6 +18,11 @@ import model.HorizontalMovement;
 import model.MachinePlayer;
 import model.RandomMovement;
 import model.VerticalMovement;
+import view.GameMenuInput;
+import view.KeyBoard;
+import view.MenuInput;
+import view.PreGameInput;
+import view.Vector2D;
 import model.TileManager;
 import model.Tile;
 import model.BluePlayer;
@@ -33,11 +33,13 @@ import model.SaveData;
 import model.PlayerType;
 import model.ControlScheme;
 
-
+/**
+ * Clase de pruebas unitarias para validar la lógica del videojuego.
+ */
 public class TheDOPOHardestGameTest {
 
-    private model.TileManager freeManager;
-    private model.TileManager wallManager;
+    private TileManager freeManager;
+    private TileManager wallManager;
     public BufferedImage dummyTexture;
     private GameState dummyGameState;
     private ControlScheme stubControls;
@@ -64,13 +66,13 @@ public class TheDOPOHardestGameTest {
             @Override public boolean isRight() { return false; }
         };
         
-        freeManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
+        freeManager = new TileManager(dummyGameState, "res/maps/level1.txt") {
             @Override public boolean isBlocked(int x, int y)    { return false; }
             @Override public boolean isGoal(int x, int y)       { return false; }
             @Override public boolean isCheckpoint(int x, int y) { return false; }
         };
 
-        wallManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
+        wallManager = new TileManager(dummyGameState, "res/maps/level1.txt") {
         	@Override public boolean isBlocked(int x, int y)    { return true; }
             @Override public boolean isGoal(int x, int y)       { return false; }
             @Override public boolean isCheckpoint(int x, int y) { return false; }

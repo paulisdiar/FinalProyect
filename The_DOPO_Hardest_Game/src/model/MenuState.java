@@ -9,8 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import Controller.Window;
-import View.MenuInput;
+import controller.Window;
+import view.MenuInput;
 
 public class MenuState {
 

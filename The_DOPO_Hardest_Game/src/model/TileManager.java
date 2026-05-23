@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import Controller.Window;
-import View.Assets;
-import View.Vector2D;
+import controller.Window;
+import view.Assets;
+import view.Vector2D;
 
 public class TileManager {
 

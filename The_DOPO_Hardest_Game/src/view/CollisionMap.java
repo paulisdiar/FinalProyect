@@ -1,9 +1,9 @@
-package View;
+package view;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import Controller.Window;
+import controller.Window;
 
 public class CollisionMap {
 

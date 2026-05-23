@@ -1,6 +1,6 @@
 package model;
 
-import View.KeyBoard;
+import view.KeyBoard;
 
 public class Player1 implements ControlScheme {
 

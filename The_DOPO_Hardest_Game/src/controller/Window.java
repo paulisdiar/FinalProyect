@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -10,8 +10,6 @@ import javax.swing.JFrame;
 
 import java.awt.image.BufferedImage;
 
-import View.Assets;
-import View.KeyBoard;
 import model.ColorConfigState;
 import model.GameMode;
 import model.GameState;
@@ -20,6 +18,8 @@ import model.MenuState;
 import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
+import view.Assets;
+import view.KeyBoard;
 
 /**
  * 
@@ -47,19 +47,22 @@ public class Window extends JFrame implements Runnable{
 	private KeyBoard         keyBoard;
 	public static int CANVAS_HEIGHT;
 	public static int CANVAS_WIDTH;
+	private JFrame frame;
 
 	private boolean inMenu    = true;
 	private boolean inOptions = false;
 
 	public Window(){
+		
+		frame = new JFrame("The DOPO Hardest Game");
+	    
 
-
-		setTitle("The DOPO Hardest Game");
-		setSize(WIDTH, HEIGHT);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
-		setLocationRelativeTo(null);
-		setVisible(true);
+		frame.setTitle("The DOPO Hardest Game");
+		frame.setSize(WIDTH, HEIGHT);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 
 		Assets.init();
 		menuState = new MenuState(this);

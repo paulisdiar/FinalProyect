@@ -1,4 +1,4 @@
-package View;
+package view;
 
 public class Vector2D {
 
