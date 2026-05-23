@@ -70,6 +70,11 @@ public class GameState {
 		initMenu();
 		loadLevel(1);
 	}
+	
+	public GameState() {
+        this.window = null; 
+        this.mode = model.GameMode.SOLO;
+	}
 
 	/**
 	 * @return {@code true} si el nivel actual es el último de la partida

@@ -17,7 +17,7 @@ public class Loader {
 	 * @param path ruta al archivo de imagen
 	 * @return imagen cargada, o {@code null} si ocurrió un error de E/S
 	 */
-	public static BufferedImage ImageLoader(String path) {
+	public static BufferedImage imageLoader(String path) {
 		try {
 			return ImageIO.read(new File(path));
 		} catch (IOException e) {
