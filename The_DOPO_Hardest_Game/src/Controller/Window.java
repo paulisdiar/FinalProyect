@@ -21,7 +21,12 @@ import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
 
-public class Window extends JFrame implements Runnable{
+/**
+ * Ventana principal del juego. Implementa el bucle de juego a 60 FPS
+ * en un hilo dedicado y gestiona la transición entre las pantallas
+ * (menú, opciones, juego).
+ */
+public class Window extends JFrame implements Runnable {
 
 	public static final int WIDTH = 800, HEIGHT = 600;
 	private Canvas canvas;
@@ -45,7 +50,11 @@ public class Window extends JFrame implements Runnable{
 	private boolean inMenu    = true;
 	private boolean inOptions = false;
 
-	public Window(){
+	/**
+	 * Inicializa la ventana, carga los assets, muestra el menú principal
+	 * y arranca el hilo del bucle de juego.
+	 */
+	public Window() {
 
 
 		setTitle("The DOPO Hardest Game");
@@ -61,10 +70,26 @@ public class Window extends JFrame implements Runnable{
 
 	}
 
+	/**
+	 * Muestra la pantalla de selección de tipo/nombre para el modo indicado.
+	 *
+	 * @param mode modo de juego seleccionado
+	 */
 	public void showColorConfig(GameMode mode) {
 		new ColorConfigState(this, mode);
 	}
 
+	/**
+	 * Configura el canvas, crea el {@link GameState} e inicia la partida.
+	 *
+	 * @param mode     modo de juego
+	 * @param texture1 sprite del Jugador 1
+	 * @param texture2 sprite del Jugador 2 o máquina
+	 * @param type1    tipo del Jugador 1
+	 * @param type2    tipo del Jugador 2
+	 * @param name1    nombre del Jugador 1
+	 * @param name2    nombre del Jugador 2 o máquina
+	 */
 	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
 		keyBoard = new KeyBoard();
 
@@ -90,6 +115,13 @@ public class Window extends JFrame implements Runnable{
 		inOptions = false;
 	}
 
+	/**
+	 * Inicia una partida a partir de datos previamente guardados.
+	 * Llama a {@link #startGame} con los datos del {@link SaveData} y luego
+	 * aplica el estado guardado mediante {@link GameState#applyLoad}.
+	 *
+	 * @param data datos de la partida guardada
+	 */
 	public void startGameFromSave(SaveData data) {
 		String n1 = (data.name1 != null) ? data.name1 : "Jugador 1";
 		String n2 = (data.name2 != null) ? data.name2 : "Jugador 2";
@@ -104,10 +136,18 @@ public class Window extends JFrame implements Runnable{
 		gameState.applyLoad(data);
 	}
 
+	/**
+	 * Punto de entrada de la aplicación.
+	 *
+	 * @param args argumentos de línea de comandos (no usados)
+	 */
 	public static void main(String[] args) {
 		new Window();
 	}
 
+	/**
+	 * Delega la actualización al estado activo (opciones, menú o juego).
+	 */
 	private void update() {
 		if (inOptions) {
 			optionsState.update();
@@ -119,7 +159,11 @@ public class Window extends JFrame implements Runnable{
 		}
 	}
 
-	private void draw(){
+	/**
+	 * Dibuja el frame actual del juego usando {@link java.awt.image.BufferStrategy}.
+	 * No hace nada si la pantalla activa es el menú o las opciones.
+	 */
+	private void draw() {
 
 		if(inMenu || inOptions) {
 			return;
@@ -146,6 +190,11 @@ public class Window extends JFrame implements Runnable{
 		bs.show();
 	}
 
+	/**
+	 * Bucle de juego principal a 60 FPS con acumulador de delta.
+	 * Ejecuta {@link #update()} y {@link #draw()} cada frame y
+	 * calcula los FPS reales cada segundo.
+	 */
 	@Override
 	public void run() {
 
@@ -177,6 +226,9 @@ public class Window extends JFrame implements Runnable{
 		stop();
 	}
 
+	/**
+	 * Crea y arranca el hilo del bucle de juego.
+	 */
 	private void start() {
 		running = true;
 		thread = new Thread(this);
@@ -184,6 +236,9 @@ public class Window extends JFrame implements Runnable{
 
 	}
 
+	/**
+	 * Detiene el hilo del bucle de juego esperando a que termine.
+	 */
 	private void stop() {
 		try {
 			thread.join();
@@ -193,16 +248,27 @@ public class Window extends JFrame implements Runnable{
 		}
 	}
 
+	/**
+	 * Muestra la pantalla de instrucciones pre-juego.
+	 */
 	public void showInstructions() {
 		new PreGameState(this);
 	}
 
+	/**
+	 * Muestra la pantalla de opciones del menú principal y activa el flag
+	 * {@code inOptions} para que el bucle de juego la procese correctamente.
+	 */
 	public void showOptions() {
 		inMenu    = false;
 		inOptions = true;
 		optionsState = new MenuOptionsState(this);
 	}
 
+	/**
+	 * Elimina la barra de menú del juego, vuelve al menú principal
+	 * y recrea el {@link MenuState}.
+	 */
 	public void goToMenu() {
 		setJMenuBar(null);
 		inMenu    = true;

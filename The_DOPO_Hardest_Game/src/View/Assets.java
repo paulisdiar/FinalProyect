@@ -2,6 +2,10 @@ package View;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Repositorio estático de todos los recursos gráficos del juego.
+ * Debe invocarse {@link #init()} una única vez al arrancar la aplicación.
+ */
 public class Assets {
 
 	public static BufferedImage player;
@@ -10,14 +14,16 @@ public class Assets {
 	public static BufferedImage tilePath1;
 	public static BufferedImage tilePath2;
 	public static BufferedImage tileGoal;
-
 	public static BufferedImage[] playerColors;
 	public static BufferedImage playerWeakGreen;
-
 	public static BufferedImage coinRed;
 	public static BufferedImage coinBlue;
 	public static BufferedImage coinGreen;
 
+	/**
+	 * Carga todos los recursos gráficos desde el sistema de archivos.
+	 * Debe invocarse una sola vez antes del inicio del bucle de juego.
+	 */
 	public static void init() {
 		player    = Loader.ImageLoader("res/players/Player.png");
 		enemy     = Loader.ImageLoader("res/enemies/Enemy.png");

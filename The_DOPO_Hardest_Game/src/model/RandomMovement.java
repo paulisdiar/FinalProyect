@@ -6,6 +6,11 @@ import java.util.Random;
 
 import View.Vector2D;
 
+/**
+ * Movimiento aleatorio: la entidad avanza en una dirección aleatoria
+ * y cambia de dirección al chocar con una pared o al superar
+ * el intervalo de cambio.
+ */
 public class RandomMovement implements MovementLogic {
 
 	private static final int SPEED = 3;
@@ -15,6 +20,16 @@ public class RandomMovement implements MovementLogic {
 	private int ticker = 0;
 	private final Random random = new Random();
 
+	/**
+	 * Calcula el desplazamiento aleatorio para este frame.
+	 * Cambia de dirección si hay pared o si se agota el intervalo.
+	 *
+	 * @param position    posición actual de la entidad
+	 * @param w           ancho de la entidad en píxeles
+	 * @param h           alto de la entidad en píxeles
+	 * @param tileManager mapa de tiles para consultar colisiones
+	 * @return arreglo {@code [dx, dy]}, o {@code [0, 0]} si no hay dirección válida
+	 */
 	@Override
 	public int[] getDirection(Vector2D position, int w, int h, TileManager tileManager) {
 		int x = (int) position.getX();
@@ -40,6 +55,14 @@ public class RandomMovement implements MovementLogic {
 		return new int[]{ finalDx, finalDy };
 	}
 
+	/**
+	 * Elige aleatoriamente una dirección libre entre las cuatro posibles.
+	 *
+	 * @param blockedRight {@code true} si la derecha está bloqueada
+	 * @param blockedLeft  {@code true} si la izquierda está bloqueada
+	 * @param blockedDown  {@code true} si abajo está bloqueado
+	 * @param blockedUp    {@code true} si arriba está bloqueado
+	 */
 	private void pickDirection(boolean blockedRight, boolean blockedLeft,
 	                           boolean blockedDown,  boolean blockedUp) {
 		List<int[]> valid = new ArrayList<>();

@@ -3,12 +3,20 @@ package View;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GameMenuInput implements ActionListener{
+/**
+ * Manejador de acciones del menú de juego (barra JMenu).
+ * Almacena las pulsaciones en un búfer y las expone como flags estáticos
+ * tras {@link #update()}.
+ */
+public class GameMenuInput implements ActionListener {
 
 	private boolean[] opciones = new boolean[5];
 
 	public static boolean GUARDAR, CARGAR, VOLVER_MENU, SALIR, PAUSAR;
 
+	/**
+	 * Inicializa todos los flags a {@code false}.
+	 */
 	public GameMenuInput() {
 		GUARDAR     = false;
 		CARGAR      = false;
@@ -17,6 +25,10 @@ public class GameMenuInput implements ActionListener{
 		PAUSAR      = false;
 	}
 
+	/**
+	 * Transfiere el búfer interno a los flags estáticos y lo limpia.
+	 * Debe llamarse una vez por frame.
+	 */
 	public void update() {
 		GUARDAR     = opciones[0];
 		CARGAR      = opciones[1];
@@ -31,14 +43,19 @@ public class GameMenuInput implements ActionListener{
 		opciones[4] = false;
 	}
 
+	/**
+	 * Registra la opción de menú seleccionada en el búfer interno.
+	 *
+	 * @param e evento de acción generado por Swing
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		switch(e.getActionCommand()) {
-			case "Guardar"       -> opciones[0] = true;
-			case "Cargar"        -> opciones[1] = true;
-			case "Volver al Menu"-> opciones[2] = true;
-			case "Salir"         -> opciones[3] = true;
-			case "Pausar"        -> opciones[4] = true;
+		switch (e.getActionCommand()) {
+			case "Guardar"        -> opciones[0] = true;
+			case "Cargar"         -> opciones[1] = true;
+			case "Volver al Menu" -> opciones[2] = true;
+			case "Salir"          -> opciones[3] = true;
+			case "Pausar"         -> opciones[4] = true;
 		}
 	}
 }

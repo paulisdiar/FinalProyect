@@ -4,6 +4,11 @@ import java.util.List;
 
 import View.Vector2D;
 
+/**
+ * Movimiento de patrulla: la entidad recorre en bucle una lista de
+ * puntos de paso. Avanza hacia el siguiente waypoint en cuanto
+ * se acerca lo suficiente al actual.
+ */
 public class PatrolMovement implements MovementLogic {
 
 	private static final int SPEED     = 3;
@@ -12,10 +17,23 @@ public class PatrolMovement implements MovementLogic {
 	private final List<Vector2D> waypoints;
 	private int current = 0;
 
+	/**
+	 * @param waypoints lista ordenada de posiciones a patrullar, en bucle
+	 */
 	public PatrolMovement(List<Vector2D> waypoints) {
 		this.waypoints = waypoints;
 	}
 
+	/**
+	 * Mueve la entidad hacia el siguiente waypoint de la ruta.
+	 * Si la lista está vacía devuelve desplazamiento cero.
+	 *
+	 * @param position    posición actual de la entidad
+	 * @param w           ancho de la entidad en píxeles
+	 * @param h           alto de la entidad en píxeles
+	 * @param tileManager mapa de tiles (no usado directamente, requerido por la interfaz)
+	 * @return arreglo {@code [dx, dy]} hacia el waypoint activo
+	 */
 	@Override
 	public int[] getDirection(Vector2D position, int w, int h, TileManager tileManager) {
 		if (waypoints.isEmpty()) {
@@ -38,10 +56,11 @@ public class PatrolMovement implements MovementLogic {
 		int dx = 0;
 		int dy = 0;
 
-		if (Math.abs(px - tx) > TOLERANCE)
+		if (Math.abs(px - tx) > TOLERANCE) {
 			dx = (px < tx) ? SPEED : -SPEED;
-		else if (Math.abs(py - ty) > TOLERANCE)
+		} else if (Math.abs(py - ty) > TOLERANCE) {
 			dy = (py < ty) ? SPEED : -SPEED;
+		}
 
 		return new int[]{ dx, dy };
 	}

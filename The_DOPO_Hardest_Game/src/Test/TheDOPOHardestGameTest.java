@@ -20,6 +20,7 @@ import model.GameMode;
 import model.GameState;
 import model.HorizontalMovement;
 import model.MachinePlayer;
+import model.PlayerType;
 import model.RandomMovement;
 import model.VerticalMovement;
 
@@ -43,7 +44,7 @@ public class TheDOPOHardestGameTest {
             @Override public void repaint() {}
         };
 
-        dummyGameState = new GameState(fakeWindow, GameMode.SOLO, dummyTexture, dummyTexture, "J1", "J2");
+        dummyGameState = new GameState(fakeWindow, GameMode.SOLO, dummyTexture, dummyTexture, PlayerType.ROJO, PlayerType.ROJO, "J1", "J2");
 
         freeManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
             @Override public boolean isBlocked(int x, int y)    { return false; }
