@@ -2,6 +2,10 @@ package model;
 
 import java.io.Serializable;
 
+/**
+ * Objeto serializable que contiene el estado completo de una partida
+ * guardada: nivel, posiciones, puntuaciones y monedas recogidas.
+ */
 public class SaveData implements Serializable {
 
 	private static final long serialVersionUID = 1L;

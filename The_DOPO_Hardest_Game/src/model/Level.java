@@ -18,6 +18,10 @@ import view.Assets;
 import view.KeyBoard;
 import view.Vector2D;
 
+/**
+ * Representa un nivel de juego en ejecución. Gestiona jugadores, enemigos,
+ * monedas, checkpoints, pausa, colisiones y condición de victoria.
+ */
 public class Level {
 
 	private GameState gp;
@@ -28,6 +32,9 @@ public class Level {
 	private List<Enemy> enemies;
 	private List<Coin> coins;
 	private List<SkinCoin> skinCoins;
+	private List<LifeSource> lifeSources;
+	private List<Bomb> bombs;
+	private List<GameEntity> allEntities;
 
 	private PlayerType     originalType1;
 	private PlayerType     originalType2;
@@ -57,6 +64,19 @@ public class Level {
 	private String name1;
 	private String name2;
 
+	/**
+	 * Crea el nivel cargando el mapa, instanciando jugadores, enemigos y monedas.
+	 *
+	 * @param gp       estado global del juego
+	 * @param mapPath  ruta al archivo de mapa (.txt)
+	 * @param mode     modo de juego (SOLO, PVP, PVM)
+	 * @param texture1 sprite del Jugador 1
+	 * @param texture2 sprite del Jugador 2 o máquina
+	 * @param type1    tipo del Jugador 1
+	 * @param type2    tipo del Jugador 2
+	 * @param name1    nombre del Jugador 1
+	 * @param name2    nombre del Jugador 2 o máquina
+	 */
 	public Level(GameState gp, String mapPath, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
 		this.gp              = gp;
 		this.mode            = mode;
@@ -83,8 +103,20 @@ public class Level {
 		initCoins();
 		totalCoins = coins.size() + tileManager.getSkinCoinPositions().size();
 		initSkinCoins();
+		initLifeSources();
+		initBombs();
+		rebuildEntityList();
 	}
 
+	/**
+	 * Instancia el subtipo de jugador humano adecuado según el tipo indicado.
+	 *
+	 * @param type     tipo de jugador
+	 * @param pos      posición inicial
+	 * @param texture  sprite del jugador
+	 * @param controls esquema de control
+	 * @return instancia de {@link HumanPlayer} correspondiente al tipo
+	 */
 	private Player createHumanPlayer(PlayerType type, Vector2D pos, BufferedImage texture, ControlScheme controls) {
 		return switch (type) {
 			case ROJO  -> new RedPlayer(pos, texture, tileManager, controls);
@@ -93,10 +125,16 @@ public class Level {
 		};
 	}
 
+	/**
+	 * @return {@code true} si el modo de juego incluye un segundo jugador (PVP o PVM)
+	 */
 	private boolean hasSecondPlayer() {
 		return mode == GameMode.PVP || mode == GameMode.PVM;
 	}
 
+	/**
+	 * Instancia todos los enemigos del nivel a partir de los datos del mapa.
+	 */
 	private void initEnemies() {
 		enemies = new ArrayList<>();
 		for (int[] s : tileManager.getEnemySpawns()) {
@@ -121,6 +159,9 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Instancia todas las monedas amarillas del nivel a partir de los datos del mapa.
+	 */
 	private void initCoins() {
 		coins = new ArrayList<>();
 		for (Vector2D pos : tileManager.getCoinPositions()) {
@@ -128,6 +169,9 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Instancia todas las monedas de skin del nivel a partir de los datos del mapa.
+	 */
 	private void initSkinCoins() {
 		skinCoins = new ArrayList<>();
 		for (int[] s : tileManager.getSkinCoinPositions()) {
@@ -140,6 +184,10 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Detecta si algún jugador toca una moneda de skin no recogida y aplica
+	 * el skin correspondiente al jugador que la recoge.
+	 */
 	private void checkSkinCoinCollisions() {
 		for (SkinCoin sc : skinCoins) {
 			if (sc.isCollected()) {
@@ -162,6 +210,16 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Crea una nueva instancia del jugador con el skin aplicado,
+	 * conservando la posición actual.
+	 *
+	 * @param skin     tipo de jugador a aplicar
+	 * @param current  jugador actual cuyos datos se preservan
+	 * @param texture  sprite base del jugador
+	 * @param controls esquema de control
+	 * @return nuevo jugador con el skin activo
+	 */
 	private Player applySkinToPlayer(PlayerType skin, Player current, BufferedImage texture, ControlScheme controls) {
 		Vector2D pos = new Vector2D(current.getPosition().getX(), current.getPosition().getY());
 		if (skin == PlayerType.VERDE) {
@@ -172,6 +230,10 @@ public class Level {
 		return next;
 	}
 
+	/**
+	 * @param p jugador del que obtener el rectángulo de colisión
+	 * @return rectángulo que ocupa el jugador en pantalla
+	 */
 	private Rectangle getRect(Player p) {
 		return new Rectangle(
 			(int) p.getPosition().getX(),
@@ -180,16 +242,32 @@ public class Level {
 		);
 	}
 
+	/**
+	 * Reposiciona un jugador en el punto de reaparición y llama a {@link Player#onRespawn()}.
+	 *
+	 * @param p          jugador a reaparecer
+	 * @param respawnPos posición donde reaparecer
+	 */
 	private void respawn(Player p, Vector2D respawnPos) {
 		p.getPosition().setX(respawnPos.getX());
 		p.getPosition().setY(respawnPos.getY());
 		p.onRespawn();
 	}
 
+	/**
+	 * Recrea el Jugador 1 con su tipo y textura originales en la posición dada.
+	 *
+	 * @param respawnPos posición donde reaparecer
+	 */
 	private void respawnPlayer1(Vector2D respawnPos) {
 		player1 = createHumanPlayer(originalType1, new Vector2D(respawnPos.getX(), respawnPos.getY()), originalTexture1, new Player1());
 	}
 
+	/**
+	 * Recrea el Jugador 2 (PVP) o reposiciona la máquina (PVM) en la posición dada.
+	 *
+	 * @param respawnPos posición donde reaparecer
+	 */
 	private void respawnPlayer2(Vector2D respawnPos) {
 		if (mode == GameMode.PVP) {
 			player2 = createHumanPlayer(originalType2, new Vector2D(respawnPos.getX(), respawnPos.getY()), originalTexture2, new Player2());
@@ -198,6 +276,10 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Actualiza los puntos de reaparición de los jugadores cuando pisan
+	 * un tile de checkpoint.
+	 */
 	private void updateCheckpointRespawn() {
 		int p1cx = (int) player1.getPosition().getX() + player1.getWidth()  / 2;
 		int p1cy = (int) player1.getPosition().getY() + player1.getHeight() / 2;
@@ -213,6 +295,9 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Detecta si algún jugador toca una moneda amarilla no recogida y la recoge.
+	 */
 	private void checkCoinCollisions() {
 		for (Coin c : coins) {
 			if (c.isCollected()) continue;
@@ -231,6 +316,9 @@ public class Level {
 		}
 	}
 
+	/**
+	 * @return {@code true} si todas las monedas (amarillas y de skin) han sido recogidas
+	 */
 	private boolean allCoinsCollected() {
 		for (Coin c : coins) {
 			if (!c.isCollected()) return false;
@@ -241,6 +329,9 @@ public class Level {
 		return true;
 	}
 
+	/**
+	 * @return número total de monedas recogidas hasta ahora (amarillas + skin)
+	 */
 	private int collectedCoins() {
 		int count = 0;
 		for (Coin c : coins) {
@@ -252,12 +343,20 @@ public class Level {
 		return count;
 	}
 
+	/**
+	 * @param p jugador a comprobar
+	 * @return {@code true} si el centro del jugador está sobre un tile de checkpoint
+	 */
 	private boolean onCheckpoint(Player p) {
 		int cx = (int) p.getPosition().getX() + p.getWidth()  / 2;
 		int cy = (int) p.getPosition().getY() + p.getHeight() / 2;
 		return tileManager.isCheckpoint(cx, cy);
 	}
 
+	/**
+	 * Detecta colisión entre los dos jugadores. Si se tocan y ninguno está
+	 * en invencibilidad ni sobre un checkpoint, ambos mueren (salvo que absorban el golpe).
+	 */
 	private void checkPlayerCollision() {
 		if (!hasSecondPlayer()) {
 			return;
@@ -284,6 +383,11 @@ public class Level {
 		invincible2 = INVINCIBLE_TIME;
 	}
 
+	/**
+	 * Detecta colisión de los jugadores con cualquier enemigo.
+	 * Si un jugador toca un enemigo sin invencibilidad, muere (salvo que absorba el golpe)
+	 * y se activa el período de invencibilidad.
+	 */
 	private void checkEnemyCollisions() {
 		for (Enemy e : enemies) {
 			Rectangle enemyRect = new Rectangle(
@@ -308,6 +412,17 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Determina el mensaje de ganador según el modo de juego.
+	 * En PVP/PVM: gana quien tenga más monedas; en empate, gana quien haya muerto menos.
+	 *
+	 * @param coins1 monedas recogidas por el Jugador 1
+	 * @param coins2 monedas recogidas por el Jugador 2
+	 * @param d1     muertes del Jugador 1
+	 * @param d2     muertes del Jugador 2
+	 * @param p1Goal {@code true} si el Jugador 1 llegó a la meta
+	 * @return mensaje de resultado del nivel
+	 */
 	private String determinarGanador(int coins1, int coins2, int d1, int d2, boolean p1Goal) {
 		if (mode == GameMode.SOLO) {
 			return "¡Nivel completado!";
@@ -330,6 +445,10 @@ public class Level {
 		return "";
 	}
 
+	/**
+	 * Comprueba si algún jugador llegó a la meta con todas las monedas recogidas.
+	 * Si es así, muestra el diálogo de fin de nivel y avanza o termina la partida.
+	 */
 	private void checkGoal() {
 		if (!allCoinsCollected()) {
 			return;
@@ -394,6 +513,110 @@ public class Level {
 		});
 	}
 
+	/**
+	 * Instancia todas las fuentes de vida del nivel a partir de los datos del mapa.
+	 */
+	private void initLifeSources() {
+		lifeSources = new ArrayList<>();
+		for (Vector2D pos : tileManager.getLifeSourcePositions()) {
+			lifeSources.add(new LifeSource(pos, Assets.coinGreen));
+		}
+	}
+
+	/**
+	 * Instancia todas las bombas del nivel a partir de los datos del mapa.
+	 */
+	private void initBombs() {
+		bombs = new ArrayList<>();
+		for (Vector2D pos : tileManager.getBombPositions()) {
+			bombs.add(new Bomb(pos, Assets.enemy));
+		}
+	}
+
+	/**
+	 * Reconstruye la lista unificada {@code allEntities} con todas las entidades
+	 * del nivel para iterar polimórficamente (R22).
+	 */
+	private void rebuildEntityList() {
+		allEntities = new ArrayList<>();
+		allEntities.addAll(enemies);
+		allEntities.addAll(coins);
+		allEntities.addAll(skinCoins);
+		allEntities.addAll(lifeSources);
+		allEntities.addAll(bombs);
+	}
+
+	/**
+	 * Detecta si algún jugador toca una fuente de vida y le otorga el bonus.
+	 */
+	private void checkLifeSourceCollisions() {
+		for (LifeSource ls : lifeSources) {
+			if (ls.isCollected()) {
+				continue;
+			}
+			Rectangle lsRect = new Rectangle(
+				(int) ls.getPosition().getX(),
+				(int) ls.getPosition().getY(),
+				14, 14
+			);
+			if (getRect(player1).intersects(lsRect)) {
+				ls.collect();
+				player1.grantLifeBonus();
+			} else if (hasSecondPlayer() && getRect(player2).intersects(lsRect)) {
+				ls.collect();
+				player2.grantLifeBonus();
+			}
+		}
+	}
+
+	/**
+	 * Detecta colisión de jugadores y enemigos con las bombas.
+	 * Una bomba explota al contacto y destruye a la entidad que la toca.
+	 */
+	private void checkBombCollisions() {
+		for (Bomb b : bombs) {
+			if (b.hasExploded()) {
+				continue;
+			}
+			Rectangle bRect = new Rectangle(
+				(int) b.getPosition().getX(),
+				(int) b.getPosition().getY(),
+				14, 14
+			);
+			if (invincible1 == 0 && getRect(player1).intersects(bRect)) {
+				b.explode();
+				if (!player1.absorbHit()) {
+					deaths1++;
+					respawnPlayer1(respawnP1);
+				}
+				invincible1 = INVINCIBLE_TIME;
+			} else if (hasSecondPlayer() && invincible2 == 0 && getRect(player2).intersects(bRect)) {
+				b.explode();
+				if (!player2.absorbHit()) {
+					deaths2++;
+					respawnPlayer2(respawnP2);
+				}
+				invincible2 = INVINCIBLE_TIME;
+			} else {
+				for (Enemy e : enemies) {
+					Rectangle eRect = new Rectangle(
+						(int) e.getPosition().getX(),
+						(int) e.getPosition().getY(),
+						13, 13
+					);
+					if (eRect.intersects(bRect)) {
+						b.explode();
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Actualiza el estado del nivel en cada frame: procesa pausa, mueve
+	 * entidades, detecta colisiones y comprueba la condición de victoria.
+	 */
 	public void update() {
 		if (levelComplete) {
 			return;
@@ -425,18 +648,30 @@ public class Level {
 		checkEnemyCollisions();
 		checkCoinCollisions();
 		checkSkinCoinCollisions();
+		checkLifeSourceCollisions();
+		checkBombCollisions();
 		checkGoal();
 		updateTimer();
 	}
 
+	/**
+	 * @return {@code true} si el nivel está actualmente pausado
+	 */
 	public boolean isPaused() {
 		return paused;
 	}
 
+	/**
+	 * Alterna el estado de pausa del nivel.
+	 */
 	public void togglePause() {
 		paused = !paused;
 	}
 
+	/**
+	 * Descuenta el temporizador de nivel; si llega a cero mata a ambos jugadores
+	 * y los envía al inicio del nivel.
+	 */
 	private void updateTimer() {
 		timerTicks--;
 		if (timerTicks <= 0) {
@@ -452,6 +687,12 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Construye un objeto {@link SaveData} con el estado actual del nivel.
+	 *
+	 * @param levelIndex índice del nivel a guardar
+	 * @return datos de partida listos para serializar
+	 */
 	public SaveData getSaveData(int levelIndex) {
 		SaveData data = new SaveData();
 		data.levelIndex  = levelIndex;
@@ -473,6 +714,11 @@ public class Level {
 		return data;
 	}
 
+	/**
+	 * Restaura el estado del nivel a partir de datos previamente guardados.
+	 *
+	 * @param data datos de partida a restaurar
+	 */
 	public void applyLoad(SaveData data) {
 		player1.getPosition().setX(data.playerX);
 		player1.getPosition().setY(data.playerY);
@@ -494,6 +740,12 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Dibuja el mapa, enemigos, monedas, jugadores, HUD y la superposición
+	 * de pausa si el nivel está pausado.
+	 *
+	 * @param g contexto gráfico del canvas
+	 */
 	public void draw(Graphics g) {
 		tileManager.draw(g);
 		for (Enemy e : enemies) {
@@ -504,6 +756,12 @@ public class Level {
 		}
 		for (SkinCoin sc : skinCoins) {
 			sc.draw(g);
+		}
+		for (LifeSource ls : lifeSources) {
+			ls.draw(g);
+		}
+		for (Bomb b : bombs) {
+			b.draw(g);
 		}
 		player1.draw(g);
 		if (hasSecondPlayer()) {
@@ -541,6 +799,12 @@ public class Level {
 		}
 	}
 
+	/**
+	 * Dibuja la superposición semi-transparente de pausa con el texto
+	 * "PAUSADO" y las instrucciones para reanudar o salir al menú.
+	 *
+	 * @param g contexto gráfico del canvas
+	 */
 	private void drawPauseOverlay(Graphics g) {
 		g.setColor(new Color(0, 0, 0, 140));
 		g.fillRect(0, 0, Window.WIDTH, Window.HEIGHT);

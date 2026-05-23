@@ -5,29 +5,37 @@ import java.awt.image.BufferedImage;
 
 import view.Vector2D;
 
-public class Coin extends GameObject {
+/**
+ * Moneda amarilla que el jugador puede recoger para sumar puntos.
+ * Extiende {@link Collectible} dentro de la jerarquía GameEntity.
+ * Desaparece visualmente al ser recogida.
+ */
+public class Coin extends Collectible {
 
-	private boolean collected = false;
-
+	/**
+	 * @param position posición inicial de la moneda
+	 * @param texture  sprite de la moneda
+	 */
 	public Coin(Vector2D position, BufferedImage texture) {
 		super(position, texture);
 	}
 
-	public boolean isCollected() {
-		return collected;
-	}
-
-	public void collect() {
-		collected = true;
-	}
-
+	/**
+	 * Sin lógica de actualización adicional.
+	 */
 	@Override
 	public void update() {
 	}
 
+	/**
+	 * Dibuja la moneda solo si aún no ha sido recogida.
+	 *
+	 * @param g contexto gráfico
+	 */
 	@Override
 	public void draw(Graphics g) {
-		if (!collected)
+		if (!isCollected()) {
 			g.drawImage(texture, (int) position.getX(), (int) position.getY(), null);
+		}
 	}
 }

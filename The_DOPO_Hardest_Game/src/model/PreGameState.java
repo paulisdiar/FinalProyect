@@ -18,15 +18,27 @@ import javax.swing.text.StyledDocument;
 
 import controller.Window;
 
+/**
+ * Estado de instrucciones previas al juego. Muestra las reglas básicas
+ * y permite al usuario elegir el modo de juego o volver al menú.
+ */
 public class PreGameState {
 
 	private Window window;
 
+	/**
+	 * Crea y muestra la pantalla de instrucciones.
+	 *
+	 * @param window ventana principal de la aplicación
+	 */
 	public PreGameState(Window window) {
 		this.window = window;
 		show();
 	}
 
+	/**
+	 * Construye y muestra los componentes Swing de la pantalla de instrucciones.
+	 */
 	private void show() {
 		window.getContentPane().removeAll();
 		window.setLayout(new BorderLayout(10, 10));

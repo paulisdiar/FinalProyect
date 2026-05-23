@@ -12,17 +12,29 @@ import javax.swing.SwingConstants;
 import controller.Window;
 import view.MenuInput;
 
+/**
+ * Estado del menú principal. Construye la interfaz Swing con los botones
+ * Jugar, Opciones y Salir, y procesa su entrada en cada frame.
+ */
 public class MenuState {
 
 	private MenuInput menuInput;
 	private Window window;
 
-	public MenuState (Window window) {
+	/**
+	 * Crea y muestra el menú principal.
+	 *
+	 * @param window ventana principal de la aplicación
+	 */
+	public MenuState(Window window) {
 		this.window = window;
 		menuInput = new MenuInput();
 		show();
 	}
 
+	/**
+	 * Construye y muestra los componentes Swing del menú principal.
+	 */
 	private void show() {
 		window.getContentPane().removeAll();
 		window.setLayout(new BorderLayout());
@@ -55,7 +67,11 @@ public class MenuState {
 		window.repaint();
 	}
 
-	public void update(){
+	/**
+	 * Procesa la entrada del menú y navega a la pantalla correspondiente.
+	 * Debe llamarse una vez por frame desde el hilo del bucle de juego.
+	 */
+	public void update() {
 		menuInput.update();
 
 		if (MenuInput.JUGAR) {

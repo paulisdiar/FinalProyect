@@ -13,17 +13,34 @@ import controller.Window;
 import view.Assets;
 import view.Vector2D;
 
+/**
+ * Carga y gestiona el mapa de tiles del nivel activo.
+ * Proporciona métodos para consultar el tipo de tile en coordenadas de pantalla
+ * y para obtener las posiciones de todos los objetos del mapa.
+ */
 public class TileManager {
 
 	GameState gp;
 	private int[][]    mapData;
 	private String[][] rawData;
 
+	/**
+	 * Crea el gestor cargando el mapa desde el archivo indicado.
+	 *
+	 * @param gp      estado global del juego
+	 * @param mapPath ruta al archivo de mapa (.txt)
+	 */
 	public TileManager(GameState gp, String mapPath) {
 		this.gp = gp;
 		loadMap(mapPath);
 	}
 
+	/**
+	 * Lee el archivo de mapa y rellena {@code mapData} y {@code rawData}.
+	 * Los tokens especiales (C, P, F, G, H) se convierten a códigos internos.
+	 *
+	 * @param path ruta al archivo de mapa
+	 */
 	private void loadMap(String path) {
 		try {
 			Scanner sc = new Scanner(new File(path));
@@ -44,6 +61,10 @@ public class TileManager {
 						mapData[row][col] = 16;
 					} else if (token.equals("H")) {
 						mapData[row][col] = 17;
+					} else if (token.equals("I")) {
+						mapData[row][col] = 18;
+					} else if (token.equals("J")) {
+						mapData[row][col] = 19;
 					} else {
 						mapData[row][col] = Integer.parseInt(token, 16);
 					}
@@ -55,6 +76,11 @@ public class TileManager {
 		}
 	}
 
+	/**
+	 * Dibuja todos los tiles del mapa en el contexto gráfico.
+	 *
+	 * @param g contexto gráfico
+	 */
 	public void draw(Graphics g) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -74,12 +100,15 @@ public class TileManager {
 				if (type == 2) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 4 || type == 6 || type == 7) g.drawImage(Assets.tileGoal, x, y, tileW, tileH, null);
 				if (type == 5) g.drawImage((row + col) % 2 == 0 ? Assets.tilePath1 : Assets.tilePath2, x, y, tileW, tileH, null);
-				if (type >= 8 && type <= 17) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
+				if (type >= 8 && type <= 19) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
 				if (type == 200 || type == 201) g.drawImage(Assets.tilePath1, x, y, tileW, tileH, null);
 			}
 		}
 	}
 
+	/**
+	 * @return lista de posiciones en pantalla de todas las monedas amarillas (tipo 5)
+	 */
 	public List<Vector2D> getCoinPositions() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -91,14 +120,26 @@ public class TileManager {
 		return positions;
 	}
 
+	/**
+	 * @return posición de spawn del Jugador 1 (tile tipo 6)
+	 */
 	public Vector2D getSpawnPlayer1() {
 		return getSpawnPosition(6);
 	}
 
+	/**
+	 * @return posición de spawn del Jugador 2 (tile tipo 7)
+	 */
 	public Vector2D getSpawnPlayer2() {
 		return getSpawnPosition(7);
 	}
 
+	/**
+	 * Busca la primera celda con el tipo indicado y devuelve su posición en pantalla.
+	 *
+	 * @param tileType código de tile a buscar
+	 * @return posición encontrada, o (0, 0) si no existe ninguna celda de ese tipo
+	 */
 	private Vector2D getSpawnPosition(int tileType) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -112,6 +153,9 @@ public class TileManager {
 		return new Vector2D(0, 0);
 	}
 
+	/**
+	 * @return lista de arreglos {@code [x, y, tipo]} para cada moneda de skin (tipos 15, 16, 17)
+	 */
 	public List<int[]> getSkinCoinPositions() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -127,6 +171,43 @@ public class TileManager {
 		return positions;
 	}
 
+	/**
+	 * @return lista de posiciones de todas las fuentes de vida (tipo 18, token I)
+	 */
+	public List<Vector2D> getLifeSourcePositions() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		List<Vector2D> positions = new ArrayList<>();
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				if (mapData[row][col] == 18) {
+					positions.add(new Vector2D(col * tileW, row * tileH));
+				}
+			}
+		}
+		return positions;
+	}
+
+	/**
+	 * @return lista de posiciones de todas las bombas (tipo 19, token J)
+	 */
+	public List<Vector2D> getBombPositions() {
+		int tileW = Window.WIDTH  / mapData[0].length;
+		int tileH = Window.HEIGHT / mapData.length;
+		List<Vector2D> positions = new ArrayList<>();
+		for (int row = 0; row < mapData.length; row++) {
+			for (int col = 0; col < mapData[0].length; col++) {
+				if (mapData[row][col] == 19) {
+					positions.add(new Vector2D(col * tileW, row * tileH));
+				}
+			}
+		}
+		return positions;
+	}
+
+	/**
+	 * @return lista de arreglos {@code [x, y, tipo]} para cada enemigo normal (tipos 8–14)
+	 */
 	public List<int[]> getEnemySpawns() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -142,6 +223,11 @@ public class TileManager {
 		return spawns;
 	}
 
+	/**
+	 * Devuelve los waypoints agrupados por identificador de patrulla (tokens P1, P2…).
+	 *
+	 * @return mapa de {@code grupoId -> lista de posiciones de waypoints}
+	 */
 	public Map<String, List<Vector2D>> getPatrolGroups() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -159,6 +245,11 @@ public class TileManager {
 		return groups;
 	}
 
+	/**
+	 * Devuelve la posición de spawn de cada patrullero (tokens C1, C2…).
+	 *
+	 * @return mapa de {@code grupoId -> posición de spawn del patrullero}
+	 */
 	public Map<String, Vector2D> getPatrolSpawns() {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -175,6 +266,13 @@ public class TileManager {
 		return spawns;
 	}
 
+	/**
+	 * Indica si las coordenadas de pantalla corresponden a un tile de checkpoint (tipo 4).
+	 *
+	 * @param x coordenada horizontal en píxeles
+	 * @param y coordenada vertical en píxeles
+	 * @return {@code true} si hay checkpoint en esa posición
+	 */
 	public boolean isCheckpoint(int x, int y) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -187,6 +285,13 @@ public class TileManager {
 		return type == 4;
 	}
 
+	/**
+	 * Indica si las coordenadas de pantalla corresponden a un tile de meta (tipo 2).
+	 *
+	 * @param x coordenada horizontal en píxeles
+	 * @param y coordenada vertical en píxeles
+	 * @return {@code true} si hay meta en esa posición
+	 */
 	public boolean isGoal(int x, int y) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;
@@ -198,6 +303,14 @@ public class TileManager {
 		return mapData[row][col] == 2;
 	}
 
+	/**
+	 * Indica si las coordenadas de pantalla corresponden a una pared (tipo 3)
+	 * o están fuera de los límites del mapa.
+	 *
+	 * @param x coordenada horizontal en píxeles
+	 * @param y coordenada vertical en píxeles
+	 * @return {@code true} si la posición está bloqueada
+	 */
 	public boolean isBlocked(int x, int y) {
 		int tileW = Window.WIDTH  / mapData[0].length;
 		int tileH = Window.HEIGHT / mapData.length;

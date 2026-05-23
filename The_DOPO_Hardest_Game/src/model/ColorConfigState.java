@@ -23,6 +23,10 @@ import javax.swing.border.TitledBorder;
 import controller.Window;
 import view.Assets;
 
+/**
+ * Pantalla de selección de tipo y nombre de jugador antes de iniciar
+ * una partida. Adapta la interfaz según el modo de juego (SOLO, PVP, PVM).
+ */
 public class ColorConfigState {
 
 	private static final PlayerType[] TYPES = PlayerType.values();
@@ -46,6 +50,13 @@ public class ColorConfigState {
 	private JTextField nameField1;
 	private JTextField nameField2;
 
+	/**
+	 * Crea y muestra la pantalla de selección de tipo.
+	 * En modo PVM genera automáticamente el tipo y color de la máquina.
+	 *
+	 * @param window ventana principal de la aplicación
+	 * @param mode   modo de juego seleccionado
+	 */
 	public ColorConfigState(Window window, GameMode mode) {
 		this.window = window;
 		this.mode = mode;
@@ -55,6 +66,12 @@ public class ColorConfigState {
 		show();
 	}
 
+	/**
+	 * Convierte un {@link PlayerType} en el índice del array {@code Assets.playerColors}.
+	 *
+	 * @param type tipo de jugador
+	 * @return índice de color correspondiente
+	 */
 	private int typeToColorIndex(PlayerType type) {
 		return switch (type) {
 			case ROJO  -> 0;
@@ -63,10 +80,17 @@ public class ColorConfigState {
 		};
 	}
 
+	/**
+	 * @param type tipo de jugador
+	 * @return textura correspondiente a ese tipo desde {@link View.Assets#playerColors}
+	 */
 	private BufferedImage textureFor(PlayerType type) {
 		return Assets.playerColors[typeToColorIndex(type)];
 	}
 
+	/**
+	 * Construye y muestra los paneles de selección según el modo de juego activo.
+	 */
 	private void show() {
 		window.getContentPane().removeAll();
 		window.setLayout(new BorderLayout(10, 10));
@@ -126,6 +150,14 @@ public class ColorConfigState {
 		window.repaint();
 	}
 
+	/**
+	 * Construye el panel de selección de tipo para un jugador humano,
+	 * incluyendo campo de nombre, vista previa y botones de tipo.
+	 *
+	 * @param label     etiqueta del panel (p. ej. "Jugador 1")
+	 * @param playerNum número de jugador (1 o 2) para asociar el campo de nombre correcto
+	 * @return panel Swing listo para añadir a la ventana
+	 */
 	private JPanel buildTypePanel(String label, int playerNum) {
 		JPanel panel = new JPanel(new BorderLayout(5, 8));
 		panel.setBorder(BorderFactory.createTitledBorder(
@@ -192,6 +224,12 @@ public class ColorConfigState {
 		return panel;
 	}
 
+	/**
+	 * Construye el panel informativo de la máquina en modo PVM,
+	 * mostrando su tipo y color generados aleatoriamente.
+	 *
+	 * @return panel Swing con la vista previa de la máquina
+	 */
 	private JPanel buildMachinePanel() {
 		JPanel panel = new JPanel(new BorderLayout(5, 12));
 		panel.setBorder(BorderFactory.createTitledBorder(
@@ -215,6 +253,14 @@ public class ColorConfigState {
 		return panel;
 	}
 
+	/**
+	 * Crea un icono escalado suavemente a las dimensiones indicadas.
+	 *
+	 * @param img imagen fuente
+	 * @param w   ancho deseado en píxeles
+	 * @param h   alto deseado en píxeles
+	 * @return icono escalado
+	 */
 	private ImageIcon scaledIcon(BufferedImage img, int w, int h) {
 		return new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
 	}

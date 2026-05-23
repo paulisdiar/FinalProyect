@@ -1,4 +1,4 @@
-package test;
+package Test;
 
 import static org.junit.Assert.*;
 
@@ -9,20 +9,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import controller.Window;
+import Controller.Window;
+import View.GameMenuInput;
+import View.KeyBoard;
+import View.MenuInput;
+import View.PreGameInput;
+import View.Vector2D;
 import model.BasicEnemy;
 import model.Coin;
 import model.GameMode;
 import model.GameState;
 import model.HorizontalMovement;
 import model.MachinePlayer;
+import model.PlayerType;
 import model.RandomMovement;
 import model.VerticalMovement;
-import view.GameMenuInput;
-import view.KeyBoard;
-import view.MenuInput;
-import view.PreGameInput;
-import view.Vector2D;
 import model.TileManager;
 import model.Tile;
 import model.BluePlayer;
@@ -33,13 +34,11 @@ import model.SaveData;
 import model.PlayerType;
 import model.ControlScheme;
 
-/**
- * Clase de pruebas unitarias para validar la lógica del videojuego.
- */
+
 public class TheDOPOHardestGameTest {
 
-    private TileManager freeManager;
-    private TileManager wallManager;
+    private model.TileManager freeManager;
+    private model.TileManager wallManager;
     public BufferedImage dummyTexture;
     private GameState dummyGameState;
     private ControlScheme stubControls;
@@ -58,21 +57,21 @@ public class TheDOPOHardestGameTest {
         };
 
         dummyGameState = new GameState(fakeWindow, GameMode.SOLO, dummyTexture, dummyTexture, PlayerType.ROJO, PlayerType.ROJO, "J1", "J2");
-        
+
         stubControls = new ControlScheme() {
             @Override public boolean isUp() { return false; }
             @Override public boolean isDown() { return false; }
             @Override public boolean isLeft() { return false; }
             @Override public boolean isRight() { return false; }
         };
-        
-        freeManager = new TileManager(dummyGameState, "res/maps/level1.txt") {
+
+        freeManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
             @Override public boolean isBlocked(int x, int y)    { return false; }
             @Override public boolean isGoal(int x, int y)       { return false; }
             @Override public boolean isCheckpoint(int x, int y) { return false; }
         };
 
-        wallManager = new TileManager(dummyGameState, "res/maps/level1.txt") {
+        wallManager = new model.TileManager(dummyGameState, "res/maps/level1.txt") {
         	@Override public boolean isBlocked(int x, int y)    { return true; }
             @Override public boolean isGoal(int x, int y)       { return false; }
             @Override public boolean isCheckpoint(int x, int y) { return false; }
