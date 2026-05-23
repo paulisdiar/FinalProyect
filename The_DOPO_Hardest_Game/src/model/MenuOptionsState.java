@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.File;
-import java.nio.file.Files;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import controller.Window;
+import Controller.Window;
 
 /**
  * Estado del menú de opciones accesible desde el menú principal.
@@ -89,22 +88,13 @@ public class MenuOptionsState {
 	 * @throws GameException si el archivo no puede leerse o no es un SaveData válido
 	 */
 	private void openSaveFile(File archivo) throws GameException {
-
-		try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(archivo.toPath()))) {
-		    SaveData data = (SaveData) ois.readObject();
-		    window.startGameFromSave(data);
-
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
 			SaveData data = (SaveData) ois.readObject();
 			window.startGameFromSave(data);
 			GameLogger.logInfo("CARGAR_MENU", "Partida cargada desde menú: " + archivo.getAbsolutePath());
-
 		} catch (IOException | ClassNotFoundException e) {
-
-		    throw new GameException("Error al abrir el archivo");
 			GameLogger.logError("CARGAR_MENU", "Fallo al cargar desde menú: " + archivo.getAbsolutePath() + " — " + e.getMessage());
 			throw new GameException("Error al abrir el archivo");
-		}
 		}
 	}
 

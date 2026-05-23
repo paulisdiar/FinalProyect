@@ -9,8 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import controller.Window;
-import view.MenuInput;
+import Controller.Window;
+import View.MenuInput;
 
 /**
  * Estado del menú principal. Construye la interfaz Swing con los botones

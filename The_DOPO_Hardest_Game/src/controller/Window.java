@@ -1,4 +1,4 @@
-package controller;
+package Controller;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -17,8 +17,8 @@ import model.MenuState;
 import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
-import view.Assets;
-import view.KeyBoard;
+import View.Assets;
+import View.KeyBoard;
 
 /**
  * Ventana principal del juego. Implementa el bucle de juego a 60 FPS
@@ -78,7 +78,6 @@ public class Window extends JFrame implements Runnable {
         setResizable(false);
         setLocationRelativeTo(null);
         setVisible(true);
-        start();
     }
 
 	/**
