@@ -29,6 +29,7 @@ public class SaveData implements Serializable {
 	public int timerTicks;
 
 	public boolean[] coinsCollected;
+	public boolean[] skinCoinsCollected;
 	public String name1;
 	public String name2;
 }

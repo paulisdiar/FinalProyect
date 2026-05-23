@@ -1,14 +1,19 @@
 package model;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import Controller.Window;
 import View.Vector2D;
 
 /**
  * Clase base de todos los jugadores. Gestiona la posición, el skin activo,
- * el tamaño escalado, la detección de colisión con tiles en los cuatro lados
- * y la vida extra otorgada por {@link LifeSource}.
+ * el tamaño escalado, la detección de colisión con tiles en los cuatro lados,
+ * la vida extra otorgada por {@link LifeSource}, el efecto de parpadeo durante
+ * la invencibilidad y el clamp de posición dentro de los bordes del mapa.
  */
 public abstract class Player extends GameObject {
 
@@ -16,6 +21,9 @@ public abstract class Player extends GameObject {
 	protected TileManager tileManager;
 	private PlayerType activeSkin = null;
 	private boolean lifeBonus = false;
+
+	private int invincibleTicks = 0;
+	private static final int BLINK_INTERVAL = 6;
 
 	/**
 	 * @param position    posición inicial del jugador
@@ -96,12 +104,58 @@ public abstract class Player extends GameObject {
 	}
 
 	/**
+	 * Activa el período de invencibilidad visual durante {@code ticks} frames.
+	 *
+	 * @param ticks duración del efecto de parpadeo
+	 */
+	public void startInvincibility(int ticks) {
+		invincibleTicks = ticks;
+	}
+
+	/**
+	 * @return {@code true} si el jugador está en el período de invencibilidad visual
+	 */
+	public boolean isInvincible() {
+		return invincibleTicks > 0;
+	}
+
+	/**
+	 * Descuenta un tick de invencibilidad. Debe llamarse cada frame desde {@link Level}.
+	 */
+	public void tickInvincibility() {
+		if (invincibleTicks > 0) {
+			invincibleTicks--;
+		}
+	}
+
+	/**
 	 * Lógica ejecutada al reaparecer tras una muerte.
-	 * Limpia el skin activo y el bonus de vida extra.
+	 * Limpia el skin activo, el bonus de vida extra y la invencibilidad.
 	 */
 	public void onRespawn() {
 		clearSkin();
 		lifeBonus = false;
+		invincibleTicks = 0;
+	}
+
+	/**
+	 * Aplica el clamp de posición para que el jugador no salga de los bordes del canvas.
+	 */
+	protected void clampToBounds() {
+		double x = position.getX();
+		double y = position.getY();
+		int w = getWidth();
+		int h = getHeight();
+		if (x < 0) {
+			position.setX(0);
+		} else if (x + w > Window.WIDTH) {
+			position.setX(Window.WIDTH - w);
+		}
+		if (y < 0) {
+			position.setY(0);
+		} else if (y + h > Window.HEIGHT) {
+			position.setY(Window.HEIGHT - h);
+		}
 	}
 
 	/**
@@ -156,11 +210,20 @@ public abstract class Player extends GameObject {
 
 	/**
 	 * Dibuja el jugador escalado según su tamaño efectivo.
+	 * Durante la invencibilidad aplica un parpadeo semi-transparente.
 	 *
 	 * @param g contexto gráfico
 	 */
 	@Override
 	public void draw(Graphics g) {
-		g.drawImage(texture, (int) position.getX(), (int) position.getY(), getWidth(), getHeight(), null);
+		if (invincibleTicks > 0 && (invincibleTicks / BLINK_INTERVAL) % 2 == 0) {
+			Graphics2D g2 = (Graphics2D) g;
+			Composite old = g2.getComposite();
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.35f));
+			g2.drawImage(texture, (int) position.getX(), (int) position.getY(), getWidth(), getHeight(), null);
+			g2.setComposite(old);
+		} else {
+			g.drawImage(texture, (int) position.getX(), (int) position.getY(), getWidth(), getHeight(), null);
+		}
 	}
 }

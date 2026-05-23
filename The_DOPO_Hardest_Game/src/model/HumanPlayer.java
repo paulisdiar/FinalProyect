@@ -65,5 +65,6 @@ public abstract class HumanPlayer extends Player {
 		if (controls.isRight() && !isCollidingRight(x, y, w, h)) {
 			position.setX(x + s);
 		}
+		clampToBounds();
 	}
 }

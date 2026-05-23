@@ -1,9 +1,12 @@
 package model;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -402,6 +405,7 @@ public class Level {
 					respawnPlayer1(respawnP1);
 				}
 				invincible1 = INVINCIBLE_TIME;
+				player1.startInvincibility(INVINCIBLE_TIME);
 			}
 			if (hasSecondPlayer() && invincible2 == 0 && getRect(player2).intersects(enemyRect)) {
 				if (!player2.absorbHit()) {
@@ -409,6 +413,7 @@ public class Level {
 					respawnPlayer2(respawnP2);
 				}
 				invincible2 = INVINCIBLE_TIME;
+				player2.startInvincibility(INVINCIBLE_TIME);
 			}
 		}
 	}
@@ -591,6 +596,7 @@ public class Level {
 					respawnPlayer1(respawnP1);
 				}
 				invincible1 = INVINCIBLE_TIME;
+				player1.startInvincibility(INVINCIBLE_TIME);
 			} else if (hasSecondPlayer() && invincible2 == 0 && getRect(player2).intersects(bRect)) {
 				b.explode();
 				if (!player2.absorbHit()) {
@@ -598,6 +604,7 @@ public class Level {
 					respawnPlayer2(respawnP2);
 				}
 				invincible2 = INVINCIBLE_TIME;
+				player2.startInvincibility(INVINCIBLE_TIME);
 			} else {
 				for (Enemy e : enemies) {
 					Rectangle eRect = new Rectangle(
@@ -633,9 +640,13 @@ public class Level {
 		}
 		if (invincible1 > 0) {
 			invincible1--;
+			player1.tickInvincibility();
 		}
 		if (invincible2 > 0) {
 			invincible2--;
+			if (hasSecondPlayer()) {
+				player2.tickInvincibility();
+			}
 		}
 		player1.update();
 		if (hasSecondPlayer()) {
@@ -643,6 +654,9 @@ public class Level {
 		}
 		for (Enemy e : enemies) {
 			e.update();
+		}
+		for (Coin c : coins) {
+			c.update();
 		}
 		updateCheckpointRespawn();
 		checkPlayerCollision();
@@ -712,6 +726,10 @@ public class Level {
 		for (int i = 0; i < coins.size(); i++) {
 			data.coinsCollected[i] = coins.get(i).isCollected();
 		}
+		data.skinCoinsCollected = new boolean[skinCoins.size()];
+		for (int i = 0; i < skinCoins.size(); i++) {
+			data.skinCoinsCollected[i] = skinCoins.get(i).isCollected();
+		}
 		return data;
 	}
 
@@ -736,6 +754,13 @@ public class Level {
 			for (int i = 0; i < Math.min(coins.size(), data.coinsCollected.length); i++) {
 				if (data.coinsCollected[i]) {
 					coins.get(i).collect();
+				}
+			}
+		}
+		if (data.skinCoinsCollected != null) {
+			for (int i = 0; i < Math.min(skinCoins.size(), data.skinCoinsCollected.length); i++) {
+				if (data.skinCoinsCollected[i]) {
+					skinCoins.get(i).collect();
 				}
 			}
 		}
@@ -769,35 +794,85 @@ public class Level {
 			player2.draw(g);
 		}
 
-		g.setFont(new Font("Arial", Font.BOLD, 16));
-		g.setColor(Color.BLACK);
-
-		int seconds = timerTicks / 60;
-		String timeText  = String.format("Tiempo: %02d:%02d", seconds / 60, seconds % 60);
-		String coinsText = "Monedas: " + collectedCoins() + "/" + totalCoins;
-
-		FontMetrics fm = g.getFontMetrics();
-		g.drawString(timeText, 10, 20);
-		g.drawString(coinsText, Window.WIDTH - fm.stringWidth(coinsText) - 10, 20);
-
-		if (mode == GameMode.PVP) {
-			String t1 = name1 + " — Muertes: " + deaths1;
-			String t2 = name2 + " — Muertes: " + deaths2;
-			g.drawString(t1, 10, 40);
-			g.drawString(t2, Window.WIDTH - fm.stringWidth(t2) - 10, 40);
-		} else if (mode == GameMode.PVM) {
-			String t1 = name1 + " — Muertes: " + deaths1;
-			String t2 = name2 + " — Muertes: " + deaths2;
-			g.drawString(t1, 10, 40);
-			g.drawString(t2, Window.WIDTH - fm.stringWidth(t2) - 10, 40);
-		} else {
-			String deathsText = name1 + " — Muertes: " + deaths1;
-			g.drawString(deathsText, (Window.WIDTH - fm.stringWidth(deathsText)) / 2, 20);
-		}
+		drawHUD(g);
 
 		if (paused) {
 			drawPauseOverlay(g);
 		}
+	}
+
+	/**
+	 * Dibuja el HUD completo: temporizador, monedas, muertes, puntaje,
+	 * indicador de escudo/vida extra y estado de invencibilidad.
+	 *
+	 * @param g contexto gráfico del canvas
+	 */
+	private void drawHUD(Graphics g) {
+		g.setFont(new Font("Arial", Font.BOLD, 15));
+		FontMetrics fm = g.getFontMetrics();
+
+		// Fondo semitransparente para el HUD
+		Graphics2D g2 = (Graphics2D) g;
+		Composite oldComp = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0, 0, Window.WIDTH, 50);
+		g2.setComposite(oldComp);
+
+		g.setColor(Color.BLACK);
+		int seconds = timerTicks / 60;
+		String timeText  = String.format("⏱ %02d:%02d", seconds / 60, seconds % 60);
+		String coinsText = "🪙 " + collectedCoins() + "/" + totalCoins;
+
+		int midX = Window.WIDTH / 2;
+		g.drawString(timeText,  midX - fm.stringWidth(timeText) / 2, 18);
+		g.drawString(coinsText, midX - fm.stringWidth(coinsText) / 2, 36);
+
+		// Lado izquierdo — Jugador 1
+		drawPlayerHUD(g, fm, player1, name1, deaths1, score1, 8, true);
+
+		// Lado derecho — Jugador 2 o máquina
+		if (hasSecondPlayer()) {
+			String p2label = name2 + " | Muertes: " + deaths2 + " | Pts: " + score2;
+			drawPlayerHUD(g, fm, player2, name2, deaths2, score2, Window.WIDTH - fm.stringWidth(p2label) - 8, false);
+		}
+	}
+
+	/**
+	 * Dibuja las estadísticas de un jugador en el HUD: nombre, muertes,
+	 * puntaje, y los iconos de escudo y vida extra si están activos.
+	 *
+	 * @param g      contexto gráfico
+	 * @param fm     métricas de fuente actuales
+	 * @param p      jugador del que mostrar datos
+	 * @param name   nombre a mostrar
+	 * @param deaths número de muertes
+	 * @param score  puntaje acumulado
+	 * @param x      posición X de inicio del texto
+	 * @param left   {@code true} si el HUD está alineado a la izquierda
+	 */
+	private void drawPlayerHUD(Graphics g, FontMetrics fm, Player p, String name, int deaths, int score, int x, boolean left) {
+		String line1 = name + " | Muertes: " + deaths;
+		String line2 = "Pts: " + score;
+		g.setColor(Color.DARK_GRAY);
+		g.drawString(line1, x, 18);
+		g.drawString(line2, x, 36);
+
+		// Indicador de escudo (solo GreenPlayer)
+		if (p instanceof GreenPlayer greenP) {
+			String shield = "🛡";
+			g.setColor(greenP.hasShieldActive() ? new Color(30, 180, 80) : new Color(160, 160, 160));
+			int sx = left ? x + fm.stringWidth(line2) + 4 : x - fm.stringWidth(shield) - 4;
+			g.drawString(shield, sx, 36);
+			g.setColor(Color.BLACK);
+		}
+		if (p.isInvincible()) {
+			g.setColor(new Color(255, 180, 0));
+			String inv = "★";
+			int ix = left ? x + fm.stringWidth(line1) + 4 : x - fm.stringWidth(inv) - 4;
+			g.drawString(inv, ix, 18);
+		}
+		g.setColor(Color.BLACK);
 	}
 
 	/**

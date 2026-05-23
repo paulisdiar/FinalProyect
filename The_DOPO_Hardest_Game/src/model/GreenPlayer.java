@@ -20,6 +20,11 @@ public class GreenPlayer extends HumanPlayer {
 
 	private boolean shieldBroken = false;
 
+	/** @return {@code true} si el escudo propio aún está intacto */
+	public boolean hasShieldActive() {
+		return !shieldBroken;
+	}
+
 	/**
 	 * @param position    posición inicial
 	 * @param texture     sprite del jugador
