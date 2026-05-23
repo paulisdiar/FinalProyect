@@ -94,6 +94,22 @@ public class Window extends JFrame implements Runnable {
 	 * @param name2    nombre del Jugador 2 o máquina
 	 */
 	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
+		startGame(mode, texture1, texture2, type1, type2, name1, name2, 1);
+	}
+
+	/**
+	 * Configura el canvas, crea el {@link GameState} e inicia la partida desde el nivel indicado.
+	 *
+	 * @param mode       modo de juego
+	 * @param texture1   sprite del Jugador 1
+	 * @param texture2   sprite del Jugador 2 o máquina
+	 * @param type1      tipo del Jugador 1
+	 * @param type2      tipo del Jugador 2
+	 * @param name1      nombre del Jugador 1
+	 * @param name2      nombre del Jugador 2 o máquina
+	 * @param startLevel nivel inicial (1-3)
+	 */
+	public void startGame(GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel) {
 		keyBoard = new KeyBoard();
 
 		canvas = new Canvas();
@@ -113,7 +129,7 @@ public class Window extends JFrame implements Runnable {
 		setLocationRelativeTo(null);
 		repaint();
 
-		gameState = new GameState(this, mode, texture1, texture2, type1, type2, name1, name2);
+		gameState = new GameState(this, mode, texture1, texture2, type1, type2, name1, name2, startLevel);
 		inMenu = false;
 		inOptions = false;
 	}
@@ -266,6 +282,16 @@ public class Window extends JFrame implements Runnable {
 		inMenu    = false;
 		inOptions = true;
 		optionsState = new MenuOptionsState(this);
+	}
+
+	/**
+	 * Limpia el estado del teclado. Llamar antes de cargar un nivel nuevo
+	 * para que las teclas retenidas durante un diálogo no queden activas.
+	 */
+	public void resetKeys() {
+		if (keyBoard != null) {
+			keyBoard.resetKeys();
+		}
 	}
 
 	/**

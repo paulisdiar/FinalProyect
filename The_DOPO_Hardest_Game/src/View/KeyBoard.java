@@ -30,6 +30,19 @@ public class KeyBoard implements KeyListener {
 	}
 
 	/**
+	 * Pone todas las teclas a {@code false}. Llamar al cargar un nivel nuevo
+	 * para evitar que teclas retenidas durante el diálogo sigan activas.
+	 */
+	public void resetKeys() {
+		java.util.Arrays.fill(keys, false);
+		java.util.Arrays.fill(wasDown, false);
+		UP = false; LEFT = false; RIGHT = false; DOWN = false;
+		W  = false; A    = false; S     = false; D    = false;
+		ESCAPE_PRESSED = false;
+		M_PRESSED      = false;
+	}
+
+	/**
 	 * Actualiza los flags estáticos según el estado actual de las teclas.
 	 * Debe llamarse una vez por frame antes de leer los flags.
 	 */

@@ -27,7 +27,7 @@ import View.GameMenuInput;
  */
 public class GameState {
 
-	private static final int TOTAL_LEVELS = 3;
+	private final int TOTAL_LEVELS;
 
 	private GameMenuInput gameMenuInput;
 	private Window window;
@@ -58,6 +58,23 @@ public class GameState {
 	 * @param name2    nombre del Jugador 2
 	 */
 	public GameState(Window window, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2) {
+		this(window, mode, texture1, texture2, type1, type2, name1, name2, 1);
+	}
+
+	/**
+	 * Crea el estado de juego e inicia desde el nivel indicado.
+	 *
+	 * @param window     ventana principal
+	 * @param mode       modo de juego
+	 * @param texture1   sprite del Jugador 1
+	 * @param texture2   sprite del Jugador 2 (o máquina)
+	 * @param type1      tipo del Jugador 1
+	 * @param type2      tipo del Jugador 2
+	 * @param name1      nombre del Jugador 1
+	 * @param name2      nombre del Jugador 2
+	 * @param startLevel nivel inicial (1-3)
+	 */
+	public GameState(Window window, GameMode mode, BufferedImage texture1, BufferedImage texture2, PlayerType type1, PlayerType type2, String name1, String name2, int startLevel) {
 		this.window = window;
 		this.mode = mode;
 		this.texture1 = texture1;
@@ -66,20 +83,34 @@ public class GameState {
 		this.type2 = type2;
 		this.name1 = name1;
 		this.name2 = name2;
+		this.TOTAL_LEVELS = LevelRegistry.countLevels(mode != GameMode.SOLO);
 		gameMenuInput = new GameMenuInput();
 		initMenu();
-		loadLevel(1);
+		loadLevel(startLevel);
 	}
 	
 	public GameState() {
-        this.window = null; 
-        this.mode = model.GameMode.SOLO;
+		this.window = null;
+		this.mode = GameMode.SOLO;
+		this.TOTAL_LEVELS = 1;
 	}
 
 	/**
 	 * @return {@code true} si el nivel actual es el último de la partida
 	 */
 	public boolean isLastLevel() {
+		return currentLevelIndex >= TOTAL_LEVELS;
+	}
+
+	/**
+	 * Indica si el nivel actual es el último sin acumular los puntajes todavía.
+	 * Usado por {@link Level} para decidir el tipo de diálogo antes de llamar a nextLevel.
+	 *
+	 * @param score1 puntaje neto del Jugador 1 en el nivel (aún no acumulado)
+	 * @param score2 puntaje neto del Jugador 2 en el nivel (aún no acumulado)
+	 * @return {@code true} si es el último nivel
+	 */
+	public boolean isLastLevel(int score1, int score2) {
 		return currentLevelIndex >= TOTAL_LEVELS;
 	}
 
@@ -133,6 +164,9 @@ public class GameState {
 	 */
 	private void loadLevel(int index) {
 		currentLevelIndex = index;
+		if (window != null) {
+			window.resetKeys();
+		}
 		String suffix = (mode == GameMode.SOLO) ? ".txt" : "_2p.txt";
 		String map = "res/maps/level" + index + suffix;
 		currentLevel = new Level(this, map, mode, texture1, texture2, type1, type2, name1, name2);

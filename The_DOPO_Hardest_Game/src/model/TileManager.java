@@ -51,7 +51,9 @@ public class TileManager {
 				for (int col = 0; col < cols; col++) {
 					String token = sc.next();
 					rawData[row][col] = token;
-					if (token.startsWith("C")) {
+					if (token.equals("C")) {
+						mapData[row][col] = 12;
+					} else if (token.startsWith("C")) {
 						mapData[row][col] = 200;
 					} else if (token.startsWith("P")) {
 						mapData[row][col] = 201;
@@ -66,7 +68,12 @@ public class TileManager {
 					} else if (token.equals("J")) {
 						mapData[row][col] = 19;
 					} else {
-						mapData[row][col] = Integer.parseInt(token, 16);
+						try {
+							mapData[row][col] = Integer.parseInt(token, 16);
+						} catch (NumberFormatException ex) {
+							GameLogger.logError("MAPA", "Token desconocido '" + token + "' en [" + row + "," + col + "] — tratado como camino");
+							mapData[row][col] = 0;
+						}
 					}
 				}
 			}

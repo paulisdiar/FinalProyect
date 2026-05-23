@@ -144,6 +144,7 @@ public class Level {
 				case 9  -> enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, new HorizontalMovement(-1)));
 				case 10 -> enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, new VerticalMovement( 1)));
 				case 11 -> enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, new VerticalMovement(-1)));
+				case 12 -> enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, new DiagonalMovement( 1,  1)));
 				case 13 -> enemies.add(new AceleradoEnemy(pos, Assets.enemy, tileManager, new HorizontalMovement( 1)));
 				case 14 -> enemies.add(new AceleradoEnemy(pos, Assets.enemy, tileManager, new VerticalMovement( 1)));
 				default -> enemies.add(new BasicEnemy(pos, Assets.enemy, tileManager, new HorizontalMovement( 1)));
@@ -458,7 +459,7 @@ public class Level {
 		boolean p1Goal = tileManager.isGoal(p1cx, p1cy);
 
 		boolean p2Goal = false;
-		if (hasSecondPlayer()) {
+		if (mode == GameMode.PVP) {
 			int p2cx = (int) player2.getPosition().getX() + player2.getWidth()  / 2;
 			int p2cy = (int) player2.getPosition().getY() + player2.getHeight() / 2;
 			p2Goal = tileManager.isGoal(p2cx, p2cy);
@@ -486,15 +487,14 @@ public class Level {
 				msg = "¡Nivel completado!\n\n" + breakdown1;
 			}
 
-			gp.nextLevel(total1, total2);
-
-			if (gp.isLastLevel()) {
-				int grandTotal1 = gp.getAccumulatedScore1();
-				int grandTotal2 = gp.getAccumulatedScore2();
+			if (gp.isLastLevel(total1, total2)) {
+				int grandTotal1 = gp.getAccumulatedScore1() + total1;
+				int grandTotal2 = gp.getAccumulatedScore2() + total2;
 				String finalMsg = msg + "\n\n--- PUNTAJE FINAL ---\n" + name1 + ": " + grandTotal1;
 				if (mode != GameMode.SOLO) {
 					finalMsg += "\n" + name2 + ": " + grandTotal2;
 				}
+				gp.nextLevel(total1, total2);
 				JOptionPane.showMessageDialog(null, finalMsg, "Juego completado", JOptionPane.INFORMATION_MESSAGE);
 				gp.getWindow().goToMenu();
 			} else {
@@ -503,8 +503,9 @@ public class Level {
 					JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
 					null, opciones, opciones[0]);
 				if (eleccion == 0) {
-					// ya se llamó nextLevel arriba, el nivel nuevo ya está cargado
+					gp.nextLevel(total1, total2);
 				} else if (eleccion == 1) {
+					gp.nextLevel(total1, total2);
 					gp.optionSavePublic();
 				} else {
 					gp.getWindow().goToMenu();

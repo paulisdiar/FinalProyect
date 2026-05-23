@@ -124,6 +124,14 @@ public class ColorConfigState {
 		bVolver.setFont(new Font("Arial", Font.PLAIN, 15));
 		bVolver.addActionListener(e -> window.goToMenu());
 
+		int totalLevels = LevelRegistry.countLevels(mode != GameMode.SOLO);
+		String[] levelNames = new String[totalLevels];
+		for (int i = 0; i < totalLevels; i++) {
+			levelNames[i] = "Nivel " + (i + 1);
+		}
+		javax.swing.JComboBox<String> levelSelector = new javax.swing.JComboBox<>(levelNames);
+		levelSelector.setFont(new Font("Arial", Font.PLAIN, 14));
+
 		JButton bJugar = new JButton("¡Jugar!");
 		bJugar.setFont(new Font("Arial", Font.BOLD, 16));
 		bJugar.addActionListener(e -> {
@@ -139,10 +147,12 @@ public class ColorConfigState {
 			} else {
 				n2 = "Jugador 2";
 			}
-			window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2);
+			int startLevel = levelSelector.getSelectedIndex() + 1;
+			window.startGame(mode, t1, t2, selectedType1, pt2, n1, n2, startLevel);
 		});
 
 		south.add(bVolver);
+		south.add(levelSelector);
 		south.add(bJugar);
 		window.add(south, BorderLayout.SOUTH);
 
