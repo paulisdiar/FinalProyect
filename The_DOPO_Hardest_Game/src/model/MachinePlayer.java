@@ -2,7 +2,7 @@ package model;
 
 import java.awt.image.BufferedImage;
 
-import View.Vector2D;
+import view.Vector2D;
 
 /**
  * Jugador controlado por la máquina. Usa una {@link MovementLogic}

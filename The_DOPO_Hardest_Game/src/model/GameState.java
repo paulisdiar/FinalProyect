@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,15 +17,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Controller.Window;
-import View.Assets;
-import View.GameMenuInput;
+import controller.Window;
+import view.Assets;
+import view.GameMenuInput;
 
+<<<<<<< HEAD
+import java.nio.file.Files;
+=======
 /**
  * Estado central de la partida en curso. Gestiona la carga de niveles,
  * la acumulación de puntaje entre niveles, el menú de juego y las
  * operaciones de guardar/cargar.
  */
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 public class GameState {
 
 	private final int TOTAL_LEVELS;
@@ -195,12 +200,21 @@ public class GameState {
 		data.textureIndex2 = typeToIndex(type2);
 		data.name1         = name1;
 		data.name2         = name2;
+<<<<<<< HEAD
+		try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(archivo.toPath()))) {
+		    oos.writeObject(data);
+=======
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
 			oos.writeObject(data);
 			GameLogger.logInfo("GUARDAR", "Partida guardada en: " + archivo.getAbsolutePath() + " | Nivel: " + currentLevelIndex + " | Jugador: " + name1);
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		} catch (IOException e) {
+<<<<<<< HEAD
+		    throw new GameException("Error al guardar el archivo");
+=======
 			GameLogger.logError("GUARDAR", "No se pudo guardar en: " + archivo.getAbsolutePath() + " — " + e.getMessage());
 			throw new GameException("Error al guardar el archivo");
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		}
 	}
 
@@ -211,13 +225,23 @@ public class GameState {
 	 * @throws GameException si el archivo no puede leerse o no es válido
 	 */
 	private void open(File archivo) throws GameException {
+<<<<<<< HEAD
+		try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(archivo.toPath()))) {
+		    SaveData data = (SaveData) ois.readObject();
+		    applyLoad(data);
+=======
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
 			SaveData data = (SaveData) ois.readObject();
 			applyLoad(data);
 			GameLogger.logInfo("CARGAR", "Partida cargada desde: " + archivo.getAbsolutePath() + " | Nivel: " + data.levelIndex);
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		} catch (IOException | ClassNotFoundException e) {
+<<<<<<< HEAD
+		    throw new GameException("Error al abrir el archivo");
+=======
 			GameLogger.logError("CARGAR", "No se pudo cargar: " + archivo.getAbsolutePath() + " — " + e.getMessage());
 			throw new GameException("Error al abrir el archivo");
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		}
 	}
 

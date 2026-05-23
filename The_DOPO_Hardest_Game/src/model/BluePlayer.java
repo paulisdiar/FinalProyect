@@ -2,7 +2,7 @@ package model;
 
 import java.awt.image.BufferedImage;
 
-import View.Vector2D;
+import view.Vector2D;
 
 /**
  * Jugador azul: 1.5× más rápido y 1.5× más grande que el jugador base.

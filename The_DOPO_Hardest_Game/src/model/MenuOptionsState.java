@@ -1,9 +1,11 @@
 package model;
 
 import java.awt.BorderLayout;
+
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.File;
+import java.nio.file.Files;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Controller.Window;
+import controller.Window;
 
 /**
  * Estado del menú de opciones accesible desde el menú principal.
@@ -87,13 +89,23 @@ public class MenuOptionsState {
 	 * @throws GameException si el archivo no puede leerse o no es un SaveData válido
 	 */
 	private void openSaveFile(File archivo) throws GameException {
+<<<<<<< HEAD
+		try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(archivo.toPath()))) {
+		    SaveData data = (SaveData) ois.readObject();
+		    window.startGameFromSave(data);
+=======
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
 			SaveData data = (SaveData) ois.readObject();
 			window.startGameFromSave(data);
 			GameLogger.logInfo("CARGAR_MENU", "Partida cargada desde menú: " + archivo.getAbsolutePath());
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		} catch (IOException | ClassNotFoundException e) {
+<<<<<<< HEAD
+		    throw new GameException("Error al abrir el archivo");
+=======
 			GameLogger.logError("CARGAR_MENU", "Fallo al cargar desde menú: " + archivo.getAbsolutePath() + " — " + e.getMessage());
 			throw new GameException("Error al abrir el archivo");
+>>>>>>> branch 'main' of https://github.com/paulisdiar/FinalProyect.git
 		}
 	}
 

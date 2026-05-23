@@ -1,9 +1,10 @@
 package model;
 
 import java.util.List;
-import java.awt.image.BufferedImage;
 
-import View.Vector2D;
+import view.Vector2D;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Enemigo patrullero que recorre una ruta fija de waypoints en bucle

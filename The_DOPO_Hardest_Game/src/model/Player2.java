@@ -1,6 +1,6 @@
 package model;
 
-import View.KeyBoard;
+import view.KeyBoard;
 
 /**
  * Esquema de control del Jugador 2: teclas WASD del teclado.

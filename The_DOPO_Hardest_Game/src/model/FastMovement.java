@@ -1,6 +1,6 @@
 package model;
 
-import View.Vector2D;
+import view.Vector2D;
 
 /**
  * Decorador de movimiento que duplica la velocidad del movimiento base.
