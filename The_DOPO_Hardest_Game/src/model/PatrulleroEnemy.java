@@ -2,7 +2,7 @@ package model;
 
 import java.util.List;
 
-import view.Vector2D;
+import View.Vector2D;
 
 import java.awt.image.BufferedImage;
 

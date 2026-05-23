@@ -2,7 +2,7 @@ package model;
 
 import java.awt.image.BufferedImage;
 
-import view.Vector2D;
+import View.Vector2D;
 
 /**
  * Moneda especial que al recogerse aplica temporalmente un skin

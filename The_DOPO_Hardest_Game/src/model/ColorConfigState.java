@@ -20,8 +20,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import controller.Window;
-import view.Assets;
+import Controller.Window;
+import View.Assets;
 
 /**
  * Pantalla de selección de tipo y nombre de jugador antes de iniciar

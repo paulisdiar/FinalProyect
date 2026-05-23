@@ -5,13 +5,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-import java.awt.image.BufferedImage;
-
-import View.Assets;
-import View.KeyBoard;
 import model.ColorConfigState;
 import model.GameMode;
 import model.GameState;
@@ -20,6 +17,8 @@ import model.MenuState;
 import model.PlayerType;
 import model.PreGameState;
 import model.SaveData;
+import View.Assets;
+import View.KeyBoard;
 
 /**
  * Ventana principal del juego. Implementa el bucle de juego a 60 FPS

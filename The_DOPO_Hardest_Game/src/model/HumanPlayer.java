@@ -2,7 +2,7 @@ package model;
 
 import java.awt.image.BufferedImage;
 
-import view.Vector2D;
+import View.Vector2D;
 
 /**
  * Jugador controlado por un humano. Delega la lectura de entrada a un

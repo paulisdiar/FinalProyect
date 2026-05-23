@@ -16,7 +16,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import controller.Window;
+import Controller.Window;
 
 /**
  * Estado de instrucciones previas al juego. Muestra las reglas básicas

@@ -1,4 +1,4 @@
-package test;
+package Test;
 
 import static org.junit.Assert.*;
 
@@ -9,12 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import controller.Window;
-import view.GameMenuInput;
-import view.KeyBoard;
-import view.MenuInput;
-import view.PreGameInput;
-import view.Vector2D;
+import Controller.Window;
+import View.GameMenuInput;
+import View.KeyBoard;
+import View.MenuInput;
+import View.PreGameInput;
+import View.Vector2D;
 import model.BasicEnemy;
 import model.Coin;
 import model.GameMode;

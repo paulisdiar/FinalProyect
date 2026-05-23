@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import controller.Window;
+import Controller.Window;
 
 /**
  * Estado del menú de opciones accesible desde el menú principal.

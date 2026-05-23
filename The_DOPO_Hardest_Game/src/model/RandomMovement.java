@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import view.Vector2D;
+import View.Vector2D;
 
 /**
  * Movimiento aleatorio: la entidad avanza en una dirección aleatoria

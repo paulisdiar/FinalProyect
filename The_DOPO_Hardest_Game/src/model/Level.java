@@ -13,10 +13,10 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import controller.Window;
-import view.Assets;
-import view.KeyBoard;
-import view.Vector2D;
+import Controller.Window;
+import View.Assets;
+import View.KeyBoard;
+import View.Vector2D;
 
 /**
  * Representa un nivel de juego en ejecución. Gestiona jugadores, enemigos,

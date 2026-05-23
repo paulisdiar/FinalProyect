@@ -3,7 +3,7 @@ package model;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import view.Vector2D;
+import View.Vector2D;
 
 /**
  * Clase base de todos los jugadores. Gestiona la posición, el skin activo,

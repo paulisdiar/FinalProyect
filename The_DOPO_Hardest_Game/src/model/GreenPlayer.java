@@ -6,8 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import view.Assets;
-import view.Vector2D;
+import View.Assets;
+import View.Vector2D;
 
 /**
  * Jugador verde: puede absorber un golpe de enemigo sin morir.

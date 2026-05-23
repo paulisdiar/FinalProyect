@@ -1,6 +1,6 @@
 package model;
 
-import view.Vector2D;
+import View.Vector2D;
 
 /**
  * Movimiento horizontal con rebote: el enemigo avanza en el eje X

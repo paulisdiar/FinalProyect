@@ -1,6 +1,6 @@
 package model;
 
-import view.KeyBoard;
+import View.KeyBoard;
 
 /**
  * Esquema de control del Jugador 1: teclas de dirección del teclado.
